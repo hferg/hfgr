@@ -7,7 +7,14 @@
 #' @param scalar The multiplier that rate is increased by in the clade specified by node.
 
 localRate <- function(tree, node = NULL, tips = NULL, scalar) {
- 
+  rateTrans <- function(tree, node, scalar) {
+    descs <- getDescs(tree, node)
+    trans.edges <- which(tree$edge[ ,2] %in% descs)
+    tree$edge.length[trans.edges] <- scalar * tree$edge.length[trans.edges]
+    tree$edge.length[which(tree$edge[ ,2] == node)] <- scalar[i] * tree$edge.length[which(tree$edge[ ,2] == node)]
+    return(tree)
+  }
+  
   if (is.null(tips)) {
    
     if (length(node) != length(scalar)) {
@@ -19,10 +26,7 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
       if (node[i] == length(tree$tip.label) + 1) {
         tree$edge.length <- tree$edge.length * scalar[i]
       } else {
-      descs <- getDescs(tree, node[i])
-      trans.edges <- which(tree$edge[ ,2] %in% descs)
-      tree$edge.length[trans.edges] <- scalar[i] * tree$edge.length[trans.edges]
-      tree$edge.length[which(tree$edge[ ,2] == node[i])] <- scalar[i] * tree$edge.length[which(tree$edge[ ,2] == node[i])]
+        tree <- ratetrans(tree, node[i], scalar[i]
       }
       
     }
@@ -38,10 +42,7 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
       if (node == length(tree$tip.label) + 1) {
         tree$edge.length <- tree$edge.length * scalar[i]
       } else {
-      descs <- getDescs(tree, node)
-      trans.edges <- which(tree$edge[ ,2] %in% descs)
-      tree$edge.length[trans.edges] <- scalar[i] * tree$edge.length[trans.edges]
-      tree$edge.length[which(tree$edge[ ,2] == node[i])] <- scalar[i] * tree$edge.length[which(tree$edge[ ,2] == node[i])]
+        tree <- ratetrans(tree, node, scalar[i]
       }
       
     }
