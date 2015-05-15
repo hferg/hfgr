@@ -9,9 +9,11 @@
 localRate <- function(tree, node = NULL, tips = NULL, scalar) {
  
   if (is.null(tips)) {
+   
     if (length(node) != length(scalar)) {
       stop("node and scalar must be the same length")
     }
+    
     for (i in 1:length(node)) {
       
       if (node[i] == length(tree$tip.label) + 1) {
@@ -25,9 +27,11 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
       
     }
   } else {
+    
     if (length(tips) != length(scalar)) {
-      stop("node and scalar must be the same length")
+      stop("tips and scalar must be the same length")
     }
+    
     for (i in 1:length(tips)) {
       node <- getMRCA(tree, tips[[i]])
       
@@ -45,6 +49,4 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
   
   return(tree)
 }
-
-plot(localRate(treesm, tips = tips, scalar = c(4, 4)))
 
