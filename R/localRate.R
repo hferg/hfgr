@@ -11,7 +11,7 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
     descs <- getDescs(tree, node)
     trans.edges <- which(tree$edge[ ,2] %in% descs)
     tree$edge.length[trans.edges] <- scalar * tree$edge.length[trans.edges]
-    tree$edge.length[which(tree$edge[ ,2] == node)] <- scalar[i] * tree$edge.length[which(tree$edge[ ,2] == node)]
+    tree$edge.length[which(tree$edge[ ,2] == node)] <- scalar * tree$edge.length[which(tree$edge[ ,2] == node)]
     return(tree)
   }
   
@@ -26,7 +26,7 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
       if (node[i] == length(tree$tip.label) + 1) {
         tree$edge.length <- tree$edge.length * scalar[i]
       } else {
-        tree <- ratetrans(tree, node[i], scalar[i]
+        tree <- rateTrans(tree, node[i], scalar[i])
       }
       
     }
@@ -42,7 +42,7 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
       if (node == length(tree$tip.label) + 1) {
         tree$edge.length <- tree$edge.length * scalar[i]
       } else {
-        tree <- ratetrans(tree, node, scalar[i]
+        tree <- rateTrans(tree, node, scalar[i])
       }
       
     }
