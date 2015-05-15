@@ -6,11 +6,11 @@
 #' @param lambda The value or values of lambda by which to transform the specified clade(s).
 
 localLambda <- function(tree, node, lambda) {
-  if (length(node) != length(scalar)) {
-    stop("node and scalar must be the same length")
+  if (length(node) != length(lambda)) {
+    stop("node and lambda must be the same length")
   }
   
-  for (i in length(node)) {
+  for (i in 1:length(node)) {
     descs <- getDescs(tree, node[i])
     trans.edges <- which(tree$edge[ ,2] %in% descs & tree$edge[ ,2] > length(tree$tip.label))
     ht1 <- nodeHeights(tree)
