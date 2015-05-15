@@ -12,6 +12,83 @@
 # I think this is a starting place from which to work on just changing a sub-section of the tree.
 
 lambdaTree<-function(tree,lambda){
+  # This is extracting the tips (I am pretty sure, since edges are numbered from the tips, and it selects all edges with a number greater
+  # than the number of tips.
+  ii<-which(tree$edge[,2]>length(tree$tip.label))
+  # This is extracting the node heights from the tree using a built-in function from phytools.
+  H1<-nodeHeights(tree)
+  # Now the internal edges (not tips) are multipled by lambda. This shortens the edges, and brings the tips in toward the past.
+  tree$edge.length[ii]<-lambda*tree$edge.length[ii]
+  # Get the node heights from the tree now that the edge lengths have been multiplied by lambda.
+  H2<-nodeHeights(tree)
+  # Now the tips are brought back to the present, and the tree has been transformed by lambda
+  tree$edge.length[-ii]<-tree$edge.length[-ii]+     H1[-ii,2]-H2[-ii,2]
+  tree
+}
+
+# This approach is fully legit - the tree is transformed according to lambda, and if you need a vcv matrix it is the same when
+# calculated from the transformed tree.
+
+# First make a pretty small tree, just sample 40 taxa from the 200 taxa tree.
+
+treesm <- drop.tip(trees[[1]], sample(length(trees[[1]]$tip.label), 160))
+
+# compare the vcv matrices from the geiger approach, and this approach. - close enough
+
+lam <- rescale(treesm, "lambda")
+tree.g <- lam(0.5)
+tree.p <- lambdaTree(treesm, 0.5)
+
+vcv.phylo(tree.g) == vcv.phylo(tree.p)
+
+vcv.phylo(tree.g) - vcv.phylo(tree.p)
+
+
+# Now I need to work out how to apply that to just a sub-set of the branch lengths.
+
+# Start by specifying a clade/node. If clade, get the MRCA, which will be a node.
+
+# use getMRCA from APE. It takes either a vector of tip names.
+
+
+
+
+# this might find all the descendant nodes, and then I think that the second column of the edges will do it?
+# So here is the lowdown. In edge column one is ancestor and column 2 is descendant, and the edge links those two nodes.
+# Branch lengths are stored in a vecotor that correspond to each row of the edges object.
+
+
+localLambda <- function(tree, node) {
+  if (is.vector(node)) {
+    node <- getMRCA(tree, node)
+  }
+}
+
+
+
+
+descNodes<-Descendants(tree2,node,"all")
+
+
+getDescendants<-function(tree,node,curr=NULL){
+  if(is.null(curr)) curr<-vector()
+  
+  daughters<-tree$edge[which(tree$edge[,1]==node),2]
+  
+  curr<-c(curr,daughters)
+  
+  w<-which(daughters>=length(tree$tip))
+  
+  if(length(w)>0) for(i in 1:length(w))
+    curr<-getDescendants(tree,daughters[w[i]],curr)
+  return(curr)
+}
+
+
+
+### Non-annotated function
+
+lambdaTree<-function(tree,lambda){
   ii<-which(tree$edge[,2]>length(tree$tip.label))
   H1<-nodeHeights(tree)
   tree$edge.length[ii]<-lambda*tree$edge.length[ii]
@@ -21,152 +98,3 @@ lambdaTree<-function(tree,lambda){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# here it is
-
-lambda.transform <- function (lambda, C) 
-{
-    if (lambda == 1) 
-        return(C)
-    else {
-        V <- diag(diag(C))
-        C <- C - V
-        C.lambda <- (V + lambda * C)
-        return(C.lambda)
-    }
-}
-
-# and it is used in phyl.pca - which is here.
-
-phyl.pca <- function (tree, Y, method = "BM", mode = "cov", ...) 
-{
-    if (hasArg(opt)) 
-        opt <- list(...)$opt
-    else opt <- "ML"
-    if (class(tree) != "phylo") 
-        stop("tree must be an object of class 'phylo.'")
-    if (length(strsplit(mode, split = "")[[1]]) <= 2) {
-        message(paste("mode = '", mode, "' not a valid option; setting mode = 'cov'", 
-            sep = ""))
-        mode = "cov"
-    }
-    if (all(strsplit(mode, split = "")[[1]] == strsplit("correlation", 
-        split = "")[[1]][1:length(strsplit(mode, split = "")[[1]])])) 
-        mode = "corr"
-    else if (all(strsplit(mode, split = "")[[1]] == strsplit("covariance", 
-        split = "")[[1]][1:length(strsplit(mode, split = "")[[1]])])) 
-        mode = "cov"
-    else {
-        message(paste("mode = '", mode, "' not a valid option; setting mode = 'cov'", 
-            sep = ""))
-        mode = "cov"
-    }
-    n <- nrow(Y)
-    m <- ncol(Y)
-    if (n > length(tree$tip)) 
-        stop("number of rows in Y cannot be greater than number of taxa in your tree")
-    Y <- as.matrix(Y)
-    if (is.null(rownames(Y))) {
-        if (nrow(Y) == n) {
-            print("Y has no names. function will assume that the row order of Y matches tree$tip.label")
-            rownames(Y) <- tree$tip.label
-        }
-        else stop("Y has no names and does not have the same number of rows as tips in tree")
-    }
-    else if (length(setdiff(rownames(Y), tree$tip.label)) != 
-        0) 
-        stop("Y has rownames, but some rownames of Y not found in tree")
-    C <- vcv.phylo(tree)[rownames(Y), rownames(Y)]
-    if (method == "BM") {
-        temp <- phyl.vcv(Y, C, 1)
-        V <- temp$R
-        a <- t(temp$alpha)
-        C <- temp$C
-    }
-    
-    else if (method == "lambda") {
-        if (opt == "ML") 
-            temp <- optimize(f = likMlambda, interval = c(0, 
-                maxLambda(tree)), X = Y, C = C, maximum = TRUE)
-        else if (opt == "REML") 
-            temp <- optimize(f = remlMlambda, interval = c(0, 
-                maxLambda(tree)), tree = tree, X = Y, maximum = TRUE)
-        lambda <- temp$maximum
-        logL <- as.numeric(temp$objective)
-        temp <- phyl.vcv(Y, C, lambda)
-        V <- temp$R
-        a <- t(temp$alpha)
-        C <- temp$C
-    }
-    invC <- solve(C)
-    if (mode == "corr") {
-        Y = Y/matrix(rep(sqrt(diag(V)), n), n, m, byrow = T)
-        V = V/(sqrt(diag(V)) %*% t(sqrt(diag(V))))
-        a <- matrix(colSums(invC %*% Y)/sum(invC), m, 1)
-    }
-    es = eigen(V)
-    result <- list()
-    result$Eval <- diag(es$values)
-    result$Evec <- es$vectors
-    dimnames(result$Eval) <- list(paste("PC", 1:ncol(Y), sep = ""), 
-        paste("PC", 1:ncol(Y), sep = ""))
-    dimnames(result$Evec) <- list(colnames(Y), paste("PC", 1:ncol(Y), 
-        sep = ""))
-    A <- matrix(rep(a, n), n, m, byrow = T)
-    result$S <- (Y - A) %*% result$Evec
-    Ccv <- t(Y - A) %*% invC %*% result$S/(n - 1)
-    result$L <- matrix(, m, m, dimnames = list(colnames(Y), paste("PC", 
-        1:ncol(Y), sep = "")))
-    for (i in 1:m) for (j in 1:m) result$L[i, j] <- Ccv[i, j]/sqrt(V[i, 
-        i] * result$Eval[j, j])
-    if (method == "lambda") {
-        result$lambda <- lambda
-        result$logL.lambda <- logL
-    }
-    class(result) <- "phyl.pca"
-    return(result)
-}
-
-# See also phylosig
-
-
-
-phyl.vcv <- function (X, C, lambda) 
-{
-    C <- lambda.transform(lambda, C)
-    invC <- solve(C)
-    a <- matrix(colSums(invC %*% X)/sum(invC), ncol(X), 1)
-    A <- matrix(rep(a, nrow(X)), nrow(X), ncol(X), byrow = T)
-    V <- t(X - A) %*% invC %*% (X - A)/(nrow(C) - 1)
-    return(list(C = C, R = V, alpha = a))
-}
-
-# 3) fuck with it, and look at the outputs.
