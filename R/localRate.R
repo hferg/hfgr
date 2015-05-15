@@ -50,4 +50,4 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
   
   return(tree)
 }
-
+	
