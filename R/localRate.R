@@ -9,6 +9,7 @@ localRate <- function(tree, node, scalar) {
   if (length(node) != length(scalar)) {
     stop("node and scalar must be the same length")
   }
+  
   for (i in 1:length(node)) {
     
     if (node[i] == length(tree$tip.label) + 1) {
