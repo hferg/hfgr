@@ -8,9 +8,51 @@
 # 2) Get the vcv matrix of the tree.
 #   Look at the lambda.transform function from phytools to get an idea of this - Liam's code is more transparent that the ocde in geiger.
 
+# 3) Here is lambdaTree from Liam Revell's blog
+# I think this is a starting place from which to work on just changing a sub-section of the tree.
+
+lambdaTree<-function(tree,lambda){
+  ii<-which(tree$edge[,2]>length(tree$tip.label))
+  H1<-nodeHeights(tree)
+  tree$edge.length[ii]<-lambda*tree$edge.length[ii]
+  H2<-nodeHeights(tree)
+  tree$edge.length[-ii]<-tree$edge.length[-ii]+     H1[-ii,2]-H2[-ii,2]
+  tree
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # here it is
 
-function (lambda, C) 
+lambda.transform <- function (lambda, C) 
 {
     if (lambda == 1) 
         return(C)
@@ -24,7 +66,7 @@ function (lambda, C)
 
 # and it is used in phyl.pca - which is here.
 
-function (tree, Y, method = "BM", mode = "cov", ...) 
+phyl.pca <- function (tree, Y, method = "BM", mode = "cov", ...) 
 {
     if (hasArg(opt)) 
         opt <- list(...)$opt
@@ -69,6 +111,7 @@ function (tree, Y, method = "BM", mode = "cov", ...)
         a <- t(temp$alpha)
         C <- temp$C
     }
+    
     else if (method == "lambda") {
         if (opt == "ML") 
             temp <- optimize(f = likMlambda, interval = c(0, 
@@ -112,6 +155,18 @@ function (tree, Y, method = "BM", mode = "cov", ...)
     return(result)
 }
 
+# See also phylosig
 
+
+
+phyl.vcv <- function (X, C, lambda) 
+{
+    C <- lambda.transform(lambda, C)
+    invC <- solve(C)
+    a <- matrix(colSums(invC %*% X)/sum(invC), ncol(X), 1)
+    A <- matrix(rep(a, nrow(X)), nrow(X), ncol(X), byrow = T)
+    V <- t(X - A) %*% invC %*% (X - A)/(nrow(C) - 1)
+    return(list(C = C, R = V, alpha = a))
+}
 
 # 3) fuck with it, and look at the outputs.
