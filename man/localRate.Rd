@@ -4,14 +4,12 @@
 \alias{localRate}
 \title{localRate}
 \usage{
-localRate(tree, node = NULL, tips = NULL, scalar)
+localRate(tree, node, scalar)
 }
 \arguments{
 \item{tree}{A tree of class phylo.}
 
-\item{node}{A node number of vector of nodes describing the clade to be transformed.}
-
-\item{tips}{A vector of tip names, or a list of vectors of tip names, that define the areas to be transformed. If used, node is ignored.}
+\item{node}{A node number describing the clade to be transformed.}
 
 \item{scalar}{The multiplier that rate is increased by in the clade specified by node.}
 }
