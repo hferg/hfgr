@@ -5,7 +5,7 @@
 #' @param node A node number describing the clade to be transformed.
 #' @param kappa The multiplier that rate is increased by in the clade specified by node.
 
-localKappa <- function(tree, node, scalar) {
+localKappa <- function(tree, node, kappa) {
     descs <- getDescs(tree, node)
     descs <- c(node, descs)
     trans.edges <- which(tree$edge[ ,2] %in% descs)
