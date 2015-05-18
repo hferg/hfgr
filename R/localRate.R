@@ -1,4 +1,4 @@
-#' localLambda
+#' localRate
 #'
 #' A function that transforms branch lengths according to a scalar.
 #' @param tree A tree of class phylo.
@@ -50,4 +50,4 @@ localRate <- function(tree, node = NULL, tips = NULL, scalar) {
   
   return(tree)
 }
-	
+
