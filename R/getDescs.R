@@ -3,6 +3,7 @@
 #' A function to get all descendant nodes from a given node, or vector of tip labels.
 #' @param tree A tree of class phylo
 #' @param node Either a single node, or a vector of tip labels
+#' @export
 
 getDescs <- function(tree, node, nds = NULL) {
 

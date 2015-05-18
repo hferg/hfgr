@@ -56,33 +56,31 @@ vcv.phylo(tree.g) - vcv.phylo(tree.p)
 # this might find all the descendant nodes, and then I think that the second column of the edges will do it?
 # So here is the lowdown. In edge column one is ancestor and column 2 is descendant, and the edge links those two nodes.
 # Branch lengths are stored in a vecotor that correspond to each row of the edges object.
+# This works - I just need to make it so that you can give ti a vector of nodes and lambdas.
 
-
-localLambda <- function(tree, node) {
-  if (is.vector(node)) {
-    node <- getMRCA(tree, node)
-  }
+localLambda <- function(tree, node, lambda) {
+  descs <- getDescs(tree, node)
+  trans.edges <- which(tree$edge[ ,2] %in% descs & tree$edge[ ,2] > length(tree$tip.label))
+  ht1 <- nodeHeights(tree)
+  tree$edge.length[trans.edges] <- lambda * tree$edge.length[trans.edges]
+  ht2 <- nodeHeights(tree)
+  tree$edge.length[-trans.edges] <- tree$edge.length[-trans.edges] + ht1[-trans.edges, 2] - ht2[-trans.edges, 2]
+  return(tree)
 }
 
 
 
 
-descNodes<-Descendants(tree2,node,"all")
 
 
-getDescendants<-function(tree,node,curr=NULL){
-  if(is.null(curr)) curr<-vector()
-  
-  daughters<-tree$edge[which(tree$edge[,1]==node),2]
-  
-  curr<-c(curr,daughters)
-  
-  w<-which(daughters>=length(tree$tip))
-  
-  if(length(w)>0) for(i in 1:length(w))
-    curr<-getDescendants(tree,daughters[w[i]],curr)
-  return(curr)
-}
+
+
+
+
+
+
+
+
 
 
 
@@ -98,3 +96,114 @@ lambdaTree<-function(tree,lambda){
 }
 
 
+
+
+
+# Actually I think I want this to return edges as well... But perhaps I can do that within local lambda.
+# it will be all the edges that end at one of these nodes, I am pretty sure...
+getDescs <- function(tree, node, nds = NULL) {
+
+  if (length(node) > 1) {
+    node <- getMRCA(tree, node)
+  }
+  
+  if (is.null(nds)) {
+    nds <- vector()
+  }
+    
+  dtrs <- tree$edge[which(tree$edge[ , 1] == node), 2]
+  nds <- c(nds, dtrs)
+  now <- which(dtrs >= length(tree$tip))
+  
+  if (length(now) > 0) {
+  
+    for (i in 1:length(now)) {
+      nds <- getDescs(tree, dtrs[now[i]], nds)
+    }
+    
+  }
+  return(nds)
+}
+
+
+
+
+
+
+
+
+
+
+
+################### Local rate transformation development.
+
+
+localRate <- function(tree, node, scalar) {
+  
+  if (node == length(tree$tip.label) + 1) {
+    tree$edge.length <- tree$edge.length * scalar
+  } else {
+  descs <- getDescs(tree, node)
+  trans.edges <- which(tree$edge[ ,2] %in% descs)
+  tree$edge.length[trans.edges] <- scalar * tree$edge.length[trans.edges]
+  tree$edge.length[which(tree$edge[ ,2] == node)] <- scalar * tree$edge.length[which(tree$edge[ ,2] == node)]
+  }
+  
+  return(tree)
+}
+
+
+# This needs to be compared to the geiger version for the same tree, node and scalar.
+
+lrate <- rescale(treesm, "lrate")
+tree.grate <- lrate(node = c(42, 62), rate = c(3, 3))
+tree.hrate <- localRate(treesm, c(42, 62), c(3, 3))
+
+par(mfrow = c(1, 2))
+plot(tree.grate)
+nodelabels()
+tiplabels()
+plot(tree.hrate)
+nodelabels()
+tiplabels()
+
+tree.grate$edge.length == tree.hrate$edge.length
+which(tree.grate$edge.length != tree.hrate$edge.length)
+
+
+# Now look at how kappa and delta work, and make functions for them.
+
+# Adapt all localX.R functions to take a list of vectors of tip names, as well as node numbers.
+
+
+# Kappa - raises branch lengths to the value of kappa - easily adaptable from localRate.
+
+
+
+# Delta - <1 makes branch lengths shorter towarsd the tips, >1 nearer to the root. 0 is BM (i.e. 
+# unchanged phylogeny). What is the mathematical operation here?
+# Delta scales total path length - so I assume when applied locally this will happen from the node specified.
+
+
+# Use geiger to work out what is happening to the branch lengths, then do it.
+
+# Local delta.
+
+# step 1 - identifiy the edges that need to be transformed.
+# step 2 - get the branching times for these edges/nodes
+# step 3 - get the max froms step 2 (the age of the clade being transformed)
+# step 4 - take the branch length, and get its age. Add this to to the branch length and raise it to delta, and then subtract the age raised to delta.
+# step 5 - step 4 is the new branch length for that branch in the loop.
+
+
+
+
+
+
+
+
+
+
+
+
+#####
