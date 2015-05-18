@@ -2,6 +2,7 @@
 
 export(gLegend)
 export(getDescs)
+export(getTipNames)
 export(ggplotShareLeg)
 export(multiplot)
 export(niceHist)
