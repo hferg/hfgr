@@ -15,7 +15,6 @@ localDelta <- function(tree, node, delta) {
   original.length <- max(times)
   times <- max(times) - times
   res <- tree
-
   
   for (i in 1:length(trans.edges)) {
     bl <- tree$edge.length[trans.edges[i]]
