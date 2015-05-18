@@ -4,7 +4,7 @@
 \alias{localKappa}
 \title{localKappa}
 \usage{
-localKappa(tree, node, scalar)
+localKappa(tree, node, kappa)
 }
 \arguments{
 \item{tree}{A tree of class phylo.}
