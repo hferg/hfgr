@@ -1,4 +1,4 @@
-#' smartRbind 
+#' smartBind 
 #'
 #' A function that will rbind vectors of different lengths and return a matrix, provided each vector element is named.
 #' @param A bunch of vectors.
@@ -6,7 +6,7 @@
 #' @examples
 #' do.call(smartRbind, list.of.vectors)
 
-smartRbind <- function (...) {
+smartBind <- function (...) {
   # from GSee http://stackoverflow.com/questions/17308551/do-callrbind-list-for-uneven-number-of-column
   dargs <- list(...)
 
