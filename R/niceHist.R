@@ -8,19 +8,22 @@
 #' @return A histogram with nice ggplot aesthetics, and good bin widths.
 #' @export
 
-niceHist <- function(parameter, fill = "lightblue", breaks = "scott") {
+niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott") {
+  dat <- parameter[!is.na(parameter)]
+  
   if (breaks == "scott") {
-    bwidth <- 3.5 * sd(parameter) * length(parameter) ^ -(1/3)
+    bwidth <- 3.5 * sd(dat) * length(dat) ^ -(1/3)
   } else if (breaks == "fandd") {
-    bwidth <- 2 * IQR(parameter) * length(parameter) ^ -(1/3)
+    bwidth <- 2 * IQR(dat) * length(dat) ^ -(1/3)
   } else {
-    bwidth = (max(parameter) - min(parameter))/30
+    bwidth = (max(dat) - min(dat))/30
   }
+    
   if (fill == "count") {
-    ggplot(data.frame(parameter = parameter), aes(x = parameter, fill = ..count..)) +
+    ggplot(data.frame(parameter = dat), aes(x = parameter, fill = ..count..)) +
       geom_histogram(color = "darkgray", binwidth = bwidth)
   } else {
-    ggplot(data.frame(parameter = parameter), aes(x = parameter)) +
+    ggplot(data.frame(parameter = dat), aes(x = parameter)) +
       geom_histogram(color = "darkgray", fill = fill, binwidth = bwidth)
   }
 }
