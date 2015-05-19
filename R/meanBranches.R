@@ -4,12 +4,23 @@
 #' @param trees An object of class multiPhylo - each tree must have the same topology.
 #' @export
 
-meanBranches <- function(trees) {
+meanBranches <- function(trees, ladderize = FALSE) {
   # gather all the edge.lengths into a list.
   bls <- list()
-  for (i in length(trees)) {
-    bls[[i]] <- trees[[i]]$edge.length
+  if (ladderize == TRUE) {
+
+    for (i in length(trees)) {
+      bls[[i]] <- ladderize(trees[[i]])$edge.length
+    }
+    
+  } else {
+
+    for (i in length(trees)) {
+      bls[[i]] <- trees[[i]]$edge.length
+    }
+      
   }
+
   return(colMeans(do.call(rbind, bls)))
 }
 
