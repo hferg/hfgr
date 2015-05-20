@@ -6,7 +6,7 @@
 #' @return a string that can be used as a label for ggplot.
 #' @export
 #' @examples
-#' lmEq(data.frame(dat, x = og, y = rj))
+#' lmEq(data.frame(x = dat$og, y = dat$rj))
 
 lmEq = function(df){
     m = lm(y ~ x, df);

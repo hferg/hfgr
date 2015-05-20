@@ -17,6 +17,6 @@ A function to generate the linear model equation and r-squared for labelling plo
 two variables against each other - e.g. branch lengths recoverd from rj bayes traits.
 }
 \examples{
-lmEq(data.frame(dat, x = og, y = rj))
+lmEq(data.frame(x = dat$og, y = dat$rj))
 }
 
