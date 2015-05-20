@@ -29,24 +29,18 @@ loadRJ <- function(logfile) {
       names(rawtail[[i]]) <- nms
     }
   }
-  
-  # That has sorted out the RJ portion of the output.
-  output <- do.call(smartBind, rawtail)
-  output <- data.frame(output[2:nrow(output), ], stringsAsFactors = FALSE)
 
-  # Now sort out the bit that describes the nodes, and defines the taxa.
-  
   tipnum <- rawhead[[1]]
-  taxatrans <- do.call(rbind, rawhead[c(1:tipnum+1)])
-  
+  taxatrans <- do.call(rbind, rawhead[c(1:tipnum+1)])  
   subtreestart <- nrow(taxatrans) + 3
   subtrees <- rawhead[subtreestart:length(rawhead)]
   
-  # Now name each element for each subtree.
   for (i in 1:length(subtrees)) {
     names(subtrees[[i]]) <- c(1:length(subtrees[[i]]))
   }
   
+  output <- do.call(smartBind, rawtail)
+  output <- data.frame(output[2:nrow(output), ], stringsAsFactors = FALSE)
   subtrees <- do.call(smartBind, subtrees)
   subtrees <- data.frame(subtrees, stringsAsFactors = FALSE)
   colnames(subtrees)[c(1:2)] <- c("node", "bl")
