@@ -4,7 +4,7 @@
 \alias{meanBranches}
 \title{meanbranches}
 \usage{
-meanBranches(trees)
+meanBranches(trees, ladderize = FALSE)
 }
 \arguments{
 \item{trees}{An object of class multiPhylo - each tree must have the same topology.}
