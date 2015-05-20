@@ -4,7 +4,7 @@
 \alias{niceHist}
 \title{niceHist}
 \usage{
-niceHist(parameter, fill = "lightblue", breaks = "scott")
+niceHist(parameter, fill = "dodgerblue", breaks = "scott")
 }
 \arguments{
 \item{parameter}{The a vecotr of values that you want a histogram of.}
