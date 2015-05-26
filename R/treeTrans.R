@@ -50,7 +50,7 @@ treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = T
         tree <- localRate(tree, nodes[i], value[i])
       }
       
-    } else if (param = "EB") {
+    } else if (param == "EB") {
     
       for (i in 1:length(nodes)) {
         tree <- localEB(tree, nodes[i], value[i], rescale = rescale)
@@ -87,7 +87,7 @@ treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = T
         tree <- localRate(tree, node, value[i])
       }
 
-    }  else if (param = "EB") {
+    }  else if (param == "EB") {
     
       for (i in 1:length(tips)) {
         node <- getMRCA(tree, tips[[i]])
