@@ -2,7 +2,7 @@
 #'
 #' A function that transforms a tree, or a local part of a tree, according to lambda, kappa, delta, or a local rate. 
 #' @param tree A tree of class phylo
-#' @param param The transformation applied to the tree, either "lambda", "kappa", "delta", or "rate"
+#' @param param The transformation applied to the tree, either "lambda", "kappa", "delta", "rate" or "EB".
 #' @param nodes A node number or vector of nodes describing the clade(s) to be transformed.
 #' @param tips A vector, or list of vectors, of tip labels definining clade(s) to be transformed
 #' @param value The value or vector of values to apply to the tree or parts of the tree. Order corresponds to the order of the elements of nodes or tips.
@@ -50,6 +50,12 @@ treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = T
         tree <- localRate(tree, nodes[i], value[i])
       }
       
+    } else if (param = "EB") {
+    
+      for (i in 1:length(nodes)) {
+        tree <- localEB(tree, nodes[i], value[i], rescale = rescale)
+      }
+    
     }
   
   } else if (is.null(nodes)) {
@@ -81,7 +87,15 @@ treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = T
         tree <- localRate(tree, node, value[i])
       }
 
+    }  else if (param = "EB") {
+    
+      for (i in 1:length(tips)) {
+        node <- getMRCA(tree, tips[[i]])
+        tree <- localEB(tree, nodes, value[i], rescale = rescale)
+      }
+    
     }
+  
   
   }
   return(tree)
