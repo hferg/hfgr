@@ -1,18 +1,18 @@
-#' branchScalars
-#'
-#' A function that calculates how often each branch is scaled, and the mean scalar of each branch.
+# branchScalars
+#
+# A function that calculates how often each branch is scaled, and the mean scalar of each branch.
 
-#' 1) Use the information from subtrees in the loadRJ output to narrow down which branches to look at.
+# 1) Use the information from subtrees in the loadRJ output to narrow down which branches to look at.
 
-#' 2) These are the only nodes that can be scaled, so go through rj_output and find out how often each of these nodes is scaled, and
-#'    what the scalar is.
+# 2) These are the only nodes that can be scaled, so go through rj_output and find out how often each of these nodes is scaled, and
+#    what the scalar is.
 
-#' 3) Use the information from subtrees and taxa to find out which branches are in each node, and then you know the frequency of each branch
-#'    being scaled. e.g. a node that
+# 3) Use the information from subtrees and taxa to find out which branches are in each node, and then you know the frequency of each branch
+#    being scaled. e.g. a node that
 
-#' 3) Use getMRCA to find out which node in my tree
+# 3) Use getMRCA to find out which node in my tree
 
-#' This is not as straight forward as it seems, but I can return the frequency with which a partition is scaled, which would be useful a bit anyway.
+# This is not as straight forward as it seems, but I can return the frequency with which a partition is scaled, which would be useful a bit anyway.
 
 # First of all, load in the output, and start playing.
 
