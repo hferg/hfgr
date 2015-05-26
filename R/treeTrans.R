@@ -13,7 +13,7 @@
 #' transTree(tree, param = "rate", nodes = c(52, 91), value = 3)
 #' transTree(tree, param = "delta", tips = list(c("dog", "cat", "moose"), c("frog", "salamander", "newt")), value = c(0.3, 2))
 
-transTree <- function(tree, param, nodes = NULL, tips = NULL, value) {
+treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = TRUE) {
   
   if (is.null(nodes) & is.null(tips)) {
     stop("Must specify either node(s) or tips")
@@ -34,13 +34,13 @@ transTree <- function(tree, param, nodes = NULL, tips = NULL, value) {
     } else if (param == "kappa") {
 
       for (i in 1:length(nodes)) {
-        tree <- localKappa(tree, nodes[i], value[i])
+        tree <- localKappa(tree, nodes[i], value[i], rescale = rescale)
       }
 
     } else if (param == "delta") {
 
       for (i in 1:length(nodes)) {
-        tree <- localDelta(tree, nodes[i], value[i])
+        tree <- localDelta(tree, nodes[i], value[i], rescale = rescale)
       }
 
     } else if (param == "rate") {
@@ -63,14 +63,14 @@ transTree <- function(tree, param, nodes = NULL, tips = NULL, value) {
 
       for (i in 1:length(tips)) {
         node <- getMRCA(tree, tips[[i]])
-        tree <- localKappa(tree, node, value[i])
+        tree <- localKappa(tree, node, value[i], rescale = rescale)
       }
     
     } else if (param == "delta") {
 
       for (i in 1:length(tips)) {
         node <- getMRCA(tree, tips[[i]])
-        tree <- localDelta(tree, node, value[i])
+        tree <- localDelta(tree, node, value[i], rescale = rescale)
       }
   
     } else if (param == "rate") {
