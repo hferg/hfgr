@@ -4,7 +4,7 @@
 \alias{localDelta}
 \title{localDelta}
 \usage{
-localDelta(tree, node, delta)
+localDelta(tree, node, delta, rescale = TRUE)
 }
 \arguments{
 \item{tree}{A tree of class phylo.}

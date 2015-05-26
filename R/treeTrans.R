@@ -6,6 +6,7 @@
 #' @param nodes A node number or vector of nodes describing the clade(s) to be transformed.
 #' @param tips A vector, or list of vectors, of tip labels definining clade(s) to be transformed
 #' @param value The value or vector of values to apply to the tree or parts of the tree. Order corresponds to the order of the elements of nodes or tips.
+#' @param rescale Whether or not to rescale the tree to have the same root-to-tip length after transformation. Defaults to TRUE.
 #' @export
 #' @keywords tree transformation kappa lambda delta rates local rates local transformation
 #' @examples
