@@ -9,7 +9,7 @@ treeTrans(tree, param, nodes = NULL, tips = NULL, value, rescale = TRUE)
 \arguments{
 \item{tree}{A tree of class phylo}
 
-\item{param}{The transformation applied to the tree, either "lambda", "kappa", "delta", or "rate"}
+\item{param}{The transformation applied to the tree, either "lambda", "kappa", "delta", "rate" or "EB".}
 
 \item{nodes}{A node number or vector of nodes describing the clade(s) to be transformed.}
 
