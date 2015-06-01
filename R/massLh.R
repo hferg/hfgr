@@ -3,6 +3,7 @@
 #' A function that will get the likelihoods for all the starter and true log files
 #' in a directory, and return a data frame of those values for future comparison.
 #' @param prefix The prefix of the log files. Needs to be followed, in the logfiles file names, with a number, then ".txt.starter.log" or ".txt.true.log"
+#' @export
 
 massLh <- function(prefix) {
   files <- list.files()[grep(prefix, list.files())]
