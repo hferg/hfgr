@@ -39,7 +39,7 @@ simuDat <- function(tree, node, a, sig, dat = NULL) {
   }
   
   dat <- data.frame(taxon = names(dat), x = dat)
-  transdat <- data.frame(taxon = names(transdat), x = dat)
+  transdat <- data.frame(taxon = names(transdat), x = transdat)
   res <- list(original = dat, transformed = transdat)
   return(res)
 }
