@@ -32,14 +32,12 @@ simuDat <- function(tree, node, a, sig, dat = NULL) {
     num <- sample(2, 1)
     
     if (num == 1) {
-      transdat[tps] <- transdat[tps] + (a * (sqrt(sig)))
+      transdat[tps] <- transdat[tps] + (bls[i] * (a * sqrt(sig)))
     } else {
-      transdat[tps] <- transdat[tps] - (a * (sqrt(sig)))
+      transdat[tps] <- transdat[tps] - (bls[i] * (a * sqrt(sig)))
     }
   }
-  
-  dat <- data.frame(taxon = names(dat), x = dat)
-  transdat <- data.frame(taxon = names(transdat), x = transdat)
+
   res <- list(original = dat, transformed = transdat)
   return(res)
 }
