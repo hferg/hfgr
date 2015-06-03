@@ -22,11 +22,12 @@ simuDatLambda <- function(tree, node, sig, w, dat = NULL) {
   tips <- descs[descs < length(tree$tip.label)]
   tips <- tree$tip.label[tips]
   
-  dd <- dat[names(dat) %in% tips]
+  dd <- transdat[names(transdat) %in% tips]
   dd <- w * dd + (1 - w) * sample(dd)
 
-  dat[names(dat) %in% tips] <- dd
+  transdat[names(transdat) %in% tips] <- dd
   
-  return(dat)
+  res <- list(original = dat, transformed = transdat)
+  return(res)
 }
 
