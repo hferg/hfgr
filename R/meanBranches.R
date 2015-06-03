@@ -10,7 +10,7 @@ meanBranches <- function(trees, ladderize = FALSE) {
   if (ladderize == TRUE) {
 
     for (i in 1:length(trees)) {
-      bls[i] <- ladderize(trees[[i]])$edge.length
+      bls[[i]] <- ladderize(trees[[i]])$edge.length
     }
     
   } else {
