@@ -1,4 +1,4 @@
-#' simuDat
+#' simuDatRate
 #'
 #' Simulate data over a phylogeny, or sub section of a phylogeny, in order to reflect variable rates.
 #' Based on adding a constant to the tip data branch by branch and weighting by branch length and does
@@ -7,10 +7,11 @@
 #' @param tree
 #' @param node
 #' @param a The constant that is weighted by branch length and added to the data at the tips. Once the relationship between scalar and this is known, this can be scalar
+#' @param sig The standard deviation of the random component of the BM simulation. NOT sigma squared.
 #' @param dat If you want to use some data you already have and change it this way, put it here.
 #' @export
 
-simuDat <- function(tree, node, a, sig, dat = NULL) {
+simuDatRate <- function(tree, node, a, sig, dat = NULL) {
   
   if (isDefined(dat)) {
     dat <- dat
@@ -32,9 +33,9 @@ simuDat <- function(tree, node, a, sig, dat = NULL) {
     num <- sample(2, 1)
     
     if (num == 1) {
-      transdat[tps] <- transdat[tps] + (bls[i] * (a * sqrt(sig)))
+      transdat[tps] <- transdat[tps] + (bls[i] * (a * sig))
     } else {
-      transdat[tps] <- transdat[tps] - (bls[i] * (a * sqrt(sig)))
+      transdat[tps] <- transdat[tps] - (bls[i] * (a * sig))
     }
   }
 
