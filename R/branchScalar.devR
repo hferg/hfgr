@@ -27,12 +27,13 @@
 
 library(BTRTools)
 library(hfgr)
+library(ape)
 setwd("/home/henry/Documents/hfg_work/tree-simulations/analysis/lkd_40mil/logs-1/lambda")
 
 
 rjlog <- "lam200_40mil.log.VarRates.txt"
 rjtrees <- read.nexus("lam200_40mil.log.VarRates.trees")
-tree <- startertree
+tree <- read.nexus("startertree200.tree")
 
 out <- loadRJ(rjlog)
 
@@ -41,14 +42,43 @@ subtrees <- out$subtrees
 
 rj <- out$rj_output
 
-scaled.nodes <- rj[ ,grep("Node.ID", colnames(rj))]
-nodes <- vector()
-for (i in 1:ncol(scaled.nodes)) {
-  nodes <- c(nodes, scaled.nodes[which(!is.na(scaled.nodes[ ,i])) ,i])
+# gives a list of two elements, one is the nodes and one the scalars. One row per sample. A cell in the first list will
+# give a node that is scaled (and thus all branches downstream of that node) and the same coordinates in the second list
+# will give the scalar.
+nodes_scalars <- list(nodes = rj[ ,grep("Node.ID", colnames(rj))], scalars = rj[ ,grep("Scale_", colnames(rj))])
+
+# So I want, per branch per run, the scalars. SO - make an array.
+
+resArray <- array(list(NULL), c(nrow(tree$edge), nrow(nodes_scalars$nodes)))
+
+# So - per run I need to take a node, find out what branches it corresponds to. Then, find the scalars and
+# compile them into a vector - and finally insert that vector into the right place in the resarray.
+
+# The loop, then, will go by run - that means by row of node.
+
+for (i in 1:nrow(nodes_scalars$nodes)) {
+
 }
+
+
+# This gives the frequency with which each node is scaled.
+nodes <- vector()
+for (i in 1:ncol(nodes_scalars$nodes)) {
+  nodes <- c(nodes, nodes_scalars$nodes[which(!is.na(nodes_scalars$nodes[ ,i])) ,i])
+  
+  for (j in 1:length(nodes)) {
+  
+  }  
+  
+}
+
 
 nodes <- as.numeric(nodes)
 nodes <- data.frame(table(nodes))
+
+
+
+
 
 result <- matrix(ncol = 7, nrow = length(tree$edge))
 colnames(result) <- c("anc", "dec", "freq", "prop", "mean_scalar", "mean_wholepost", "taxa")
@@ -67,13 +97,45 @@ for (i in 1:nrow(subtrees)) {
   
 }
 
-# Problem - more than one of the subtrees gives 201 as the root node - investigate.
+
+# This will make a 2x2 array, that will take vectors or lists as it's elements. 
+myListArray <- array(list(NULL), c(3, 2))
+myListArray[[1, 1]] <- list(c(1,2,3), c(44, 66, 78))
+myListArray[[1, 2]] <- c(1, 2, 3)
+
+
+
+
+
+# Problem - more than one of the subtrees gives 201 as the root node - investigate. This was some kind of bozo mistake - 
+# The mistake is this: After the number defining the partition comes the branch length, THEN comes the number of taxa in that
+# partition, that number is NOT a taxon.
 
 tiplabs <- which(startertree$tip.label %in% tips)
 plot(startertree, label.offset = 0.6)
 tiplabels(tip = tiplabs, cex = 0.7)
 
 
+# OK - Branches are defined by the partition that they lead too, which are defined by the taxa that make them up.
+# That means that if I match up the taxa list, and get the most recent common ancestor, I get the node that the branch ENDS
+# at. I can then use that to get the ancestor node from the edge matrix in the tree, and then add the required information
+# to the table - I just need to work out how to process the information to do that.
+
+# STEP ONE. Per iteration, find out which partitions are scaled. That partition in total has had a lambda applied to it,
+#   which means ALL of the branches that make it up have had a lambda transformation. Each of these branches gets +1 in it's
+#   number of times scaled, and the lambda value is recorded. If there is more than one partition scaled in the iteration, and a 
+#   branch is in both of those partitions, it gets +1 twice (+2) and it's lambda is the mean value of the number of scaling events.
+#   This info needs to be stored.
+
+# STEP TWO. Once I know what happens to each branch in each iteration, I can work out the percentage of time scaled (the number of +1
+#   in total over the whole set of iteration) and the mean lambda for it (the mean of lambda, across all iterations).
+# Do I need to try and use an array here? Yes - So it is a matrix with one row per branch, and one column per iteration, then 2
+# z-dimensions - one for the counts, and one for the lambdas. If there are two or more lambdas, store them either in more dimensions,
+# or as a vector? Can't add a vector to the array - so i think I either need to rethink, or instead pick some other method (like lsits, perhaps - which 
+# can take vectors as an element).
+
+
+# Store the data, I think, with a 3-deep list.
 
 
 
