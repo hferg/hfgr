@@ -5,7 +5,7 @@
 \title{modeStat
 Calculate the mode.}
 \usage{
-modeStat(x)
+modeStat(x, log = FALSE)
 }
 \description{
 modeStat
