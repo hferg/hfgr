@@ -40,6 +40,7 @@ out <- loadRJ(rjlog)
 taxa <- out$taxa
 subtrees <- out$subtrees
 
+
 rj <- out$rj_output
 
 # gives a list of two elements, one is the nodes and one the scalars. One row per sample. A cell in the first list will
@@ -49,16 +50,70 @@ nodes_scalars <- list(nodes = rj[ ,grep("Node.ID", colnames(rj))], scalars = rj[
 
 # So I want, per branch per run, the scalars. SO - make an array.
 
-resArray <- array(list(NULL), c(nrow(tree$edge), nrow(nodes_scalars$nodes)))
+resArray <- array(list(NULL), c(nrow(tree$edge), (nrow(nodes_scalars$nodes))))
 
 # So - per run I need to take a node, find out what branches it corresponds to. Then, find the scalars and
 # compile them into a vector - and finally insert that vector into the right place in the resarray.
 
 # The loop, then, will go by run - that means by row of node.
 
-for (i in 1:nrow(nodes_scalars$nodes)) {
+# THIS IS INCORRECT - These nodes are not the same as the nodes in my tree - and as such they need to be translated against the
+# translation table.
 
+# Translate nodes from the RJ output into my tree-specific nodes? Or look up when I need to? This looks up when needs be - and totally
+# works. It might be slow though - can fix later on.
+
+for (i in 1:nrow(nodes_scalars$nodes)) {
+  nodes <- nodes_scalars$nodes[i , !is.na(nodes_scalars$nodes[i, ])]
+  scalars <- nodes_scalars$scalars[i, !is.na(nodes_scalars$scalars[i, ])]
+  print(i)
+
+  if (length(nodes) == 0) {
+
+  } else if (length(nodes) > 1) {
+    for (j in 1:ncol(nodes)) {
+      taxcols <- which(!is.na(subtrees[subtrees$node == nodes[1, j], ]))
+      tax <- subtrees[subtrees$node == nodes[1, j], taxcols[c(4:length(taxcols))]]
+      tips <- taxa[as.numeric(tax[1, ]), 2]
+      node <- getMRCA(tree, tips)
+
+      # First find the branches that come from this node.
+      descs <- getDescs(tree, node)
+      edges <- which(tree$edge[ ,2] %in% descs)
+      edges <- c(edges, which(tree$edge[ ,2] == node))
+
+      for (k in edges) {
+        if (is.null(resArray[[k, i]])) {
+          resArray[[k, i]] <- as.numeric(scalars[1, j])
+        } else {
+          resArray[[k, i]] <- c(resArray[[k, i]] <- as.numeric(scalars[1, j]))
+        }
+      }
+    }
+  } else {
+    taxcols <- which(!is.na(subtrees[subtrees$node == nodes, ]))
+    tax <- subtrees[subtrees$node == nodes, taxcols[c(4:length(taxcols))]]
+    tips <- taxa[as.numeric(tax[1, ]), 2]
+    node <- getMRCA(tree, tips)
+
+    descs <- getDescs(tree, node)
+    edges <- which(tree$edge[ ,2] %in% descs)
+    edges <- c(edges, which(tree$edge[ ,2] == node))
+
+    for (k in edges) {
+      if (is.null(resArray[[k, i]])) {
+        resArray[[k, i]] <- as.numeric(scalars)
+      } else {
+        resArray[[k, i]] <- c(resArray[[k, i]] <- as.numeric(scalars))
+      }
+    }
+  }
 }
+
+
+# Now resArray needs to be counted up for NULLS per branch to find out scaling frequency etc.
+
+# Per branch - the length of unlist over the length of all runs is the percentage.
 
 
 # This gives the frequency with which each node is scaled.
@@ -67,7 +122,7 @@ for (i in 1:ncol(nodes_scalars$nodes)) {
   nodes <- c(nodes, nodes_scalars$nodes[which(!is.na(nodes_scalars$nodes[ ,i])) ,i])
   
   for (j in 1:length(nodes)) {
-  
+    
   }  
   
 }
@@ -75,9 +130,6 @@ for (i in 1:ncol(nodes_scalars$nodes)) {
 
 nodes <- as.numeric(nodes)
 nodes <- data.frame(table(nodes))
-
-
-
 
 
 result <- matrix(ncol = 7, nrow = length(tree$edge))
@@ -89,13 +141,6 @@ result[ ,"prop"] <- 0
 result[ ,"mean_scalar"] <- 0
 result[ ,"mean_wholepost"] <- 0
 
-for (i in 1:nrow(subtrees)) {
-  taxcols <- which(!is.na(subtrees[i, ]))
-  tax <- subtrees[i, taxcols[c(4:length(taxcols))]]
-  tips <- taxa[as.numeric(tax[1, ]) ,2]
-  node <- subtrees$node[i]
-  
-}
 
 
 # This will make a 2x2 array, that will take vectors or lists as it's elements. 

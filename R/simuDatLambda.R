@@ -6,6 +6,7 @@
 #' @param sig The standard deviation for the Brownian Motion process.
 #' @param w The weight parameter. 1 = strong signal, 0 = weak signal.
 #' @param dat A specified dataset, if you want to simulate the loss of signal on an existing dataset, ot something.
+#' @export
 
 simuDatLambda <- function(tree, node, sig, w, dat = NULL) {
   
