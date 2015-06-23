@@ -10,8 +10,8 @@
 loadRJ <- function(logfile) {
 
   raw <- readLines(logfile)
-  rawhead <- strsplit(raw[1:(grep("\\bIt*\\b", raw) -1)], "\t")
-  rawtail <- strsplit(raw[grep("\\bIt*\\b", raw):length(raw)], "\t")
+  rawhead <- strsplit(raw[1:(max(grep("^(It*)", raw)) -1)], "\t")
+  rawtail <- strsplit(raw[max(grep("^(It*)", raw)):length(raw)], "\t")
   nms1 <- rawtail[[1]][1:7]
   nms2 <- rawtail[[1]][8:length(rawtail[[1]])]
 
