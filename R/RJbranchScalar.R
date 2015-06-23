@@ -81,10 +81,19 @@ RJbranchScalar <- function(rjlog, rjtrees, tree) {
     result[i, "prop"] <- length(unlist(resArray[i, ])) / ncol(resArray)
     result[i, "mn"] <- mean(unlist(resArray[i, ]))
     result[i, "mn_wp"] <- mean(c(unlist(resArray[i, ]), rep(1, (ncol(resArray) - length(unlist(resArray[i, ]))))))
-    result[i ,"md"] <- median(unlist(resArray[i, ]))
-    result[i ,"md_wp"] <- median(c(unlist(resArray[i, ]), rep(1, (ncol(resArray) - length(unlist(resArray[i, ]))))))
-    result[i ,"mod"] <- modeStat(unlist(resArray[i, ]))
-    result[i ,"mod_wp"] <- modeStat(c(unlist(resArray[i, ]), rep(1, (ncol(resArray) - length(unlist(resArray[i, ]))))))
+    
+    if (length(unlist(resArray[i, ])) <= 2) {
+      result[i, "md"] <- NA
+      result[i, "md_wp"] <- NA
+      result[i, "mod"] <- NA
+      result[i, "mod_wp"] <- NA
+    } else {
+      result[i ,"mod"] <- modeStat(unlist(resArray[i, ]))
+      result[i ,"mod_wp"] <- modeStat(c(unlist(resArray[i, ]), rep(1, (ncol(resArray) - length(unlist(resArray[i, ]))))))
+      result[i ,"md"] <- median(unlist(resArray[i, ]))
+      result[i ,"md_wp"] <- median(c(unlist(resArray[i, ]), rep(1, (ncol(resArray) - length(unlist(resArray[i, ]))))))      
+    }
+    
   }
 
   result <- data.frame(result)
