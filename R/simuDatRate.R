@@ -28,7 +28,7 @@ simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive") {
   edges <- tree$edge[tree$edge[ ,2] %in% c(internal, tips), ]
   bls <- tree$edge.length[tree$edge[ ,2] %in% c(internal, tips)]
   
-  if (method = "recursive") {
+  if (method == "recursive") {
     
     for (i in 1:nrow(edges)) {
       tps <- getDescs(tree, edges[i, 2])
@@ -42,7 +42,7 @@ simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive") {
       }
     }
     
-  } else if (method = "path") {
+  } else if (method == "path") {
   
     print("Not implemented")
   

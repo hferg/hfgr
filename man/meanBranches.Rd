@@ -4,10 +4,14 @@
 \alias{meanBranches}
 \title{meanbranches}
 \usage{
-meanBranches(trees, ladderize = FALSE)
+meanBranches(trees, ladderize = FALSE, returntree = FALSE)
 }
 \arguments{
 \item{trees}{An object of class multiPhylo - each tree must have the same topology.}
+
+\item{ladderize}{Ladderize the input trees or not}
+
+\item{returntree}{Return the mean branch-lengthed tree or not? Defaults to FALSE, and only works if topologies are identical between trees.}
 }
 \description{
 Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.

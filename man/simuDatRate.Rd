@@ -4,7 +4,7 @@
 \alias{simuDatRate}
 \title{simuDatRate}
 \usage{
-simuDatRate(tree, node, a, sig, dat = NULL)
+simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive")
 }
 \arguments{
 \item{tree}{}
@@ -16,6 +16,8 @@ simuDatRate(tree, node, a, sig, dat = NULL)
 \item{sig}{The standard deviation of the random component of the BM simulation. NOT sigma squared.}
 
 \item{dat}{If you want to use some data you already have and change it this way, put it here.}
+
+\item{method}{Either add values recursively by tail branch length (default), or alternative "path" - which adds values proportional to total path length.}
 }
 \description{
 Simulate data over a phylogeny, or sub section of a phylogeny, in order to reflect variable rates.
