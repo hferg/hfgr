@@ -14,16 +14,18 @@ loadRJ <- function(logfile) {
   rawtail <- strsplit(raw[grep("\\bIt*\\b", raw):length(raw)], "\t")
   nms1 <- rawtail[[1]][1:7]
   nms2 <- rawtail[[1]][8:length(rawtail[[1]])]
+  nms2 <- gsub(" ", "", nms2)
+  nms2 <- gsub("/", "", nms2)  
 
   for (i in 1:length(rawtail)) {
     if (length(rawtail[[i]]) == 7) {
       names(rawtail[[i]]) <- nms1
     } else {
       len <- length(rawtail[[i]][8:length(rawtail[[i]])])
-      end <- vector()
+      end <- vector(mode = "character", length = len)
 
-      for (j in 1:(len/4)) {
-        end <- c(end, paste(nms2, j, sep = "_"))
+      for (j in 1:length(end)) {
+        end[j] <- paste(nms2, j, sep = "_")
       }
       nms <- c(nms1, end)
       names(rawtail[[i]]) <- nms
