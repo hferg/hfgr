@@ -23,9 +23,13 @@ loadRJ <- function(logfile) {
     } else {
       len <- length(rawtail[[i]][8:length(rawtail[[i]])])
       end <- vector(mode = "character", length = len)
-
-      for (j in 1:length(end)) {
-        end[j] <- paste(nms2, j, sep = "_")
+      
+      st <- 1
+      ed <- 4
+      for (j in 1:(len/4)) { 
+        end[c(st:ed)] <- paste(nms2, j, sep = "_")
+        st <- st + 4
+        ed <- ed + 4
       }
       nms <- c(nms1, end)
       names(rawtail[[i]]) <- nms
