@@ -20,7 +20,7 @@ simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive",
 
 \item{method}{Either add values recursively by tail branch length (default), or alternative "path" - which adds values proportional to total path length.}
 
-\item{standardise}{Logical, whether or not to z-standardise the data. Defaults to FALSE}
+\item{standardise}{Logical, whether or not to z-standardise the data. Defaults to FALSE.}
 }
 \description{
 Simulate data over a phylogeny, or sub section of a phylogeny, in order to reflect variable rates.
