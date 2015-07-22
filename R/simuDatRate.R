@@ -10,10 +10,10 @@
 #' @param sig The standard deviation of the random component of the BM simulation. NOT sigma squared.
 #' @param dat If you want to use some data you already have and change it this way, put it here.
 #' @param method Either add values recursively by tail branch length (default), or alternative "path" - which adds values proportional to total path length.
-#' @param standardise Logical, whether or not to z-standardise the data. Defaults to TRUE
+#' @param standardise Logical, whether or not to z-standardise the data. Defaults to FALSE
 #' @export
 
-simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive", standardise = TRUE) {
+simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive", standardise = FALSE) {
   
   if (isDefined(dat)) {
     dat <- dat
