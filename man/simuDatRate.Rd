@@ -4,7 +4,8 @@
 \alias{simuDatRate}
 \title{simuDatRate}
 \usage{
-simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive")
+simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive",
+  standardise = TRUE)
 }
 \arguments{
 \item{tree}{}
@@ -18,6 +19,8 @@ simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive")
 \item{dat}{If you want to use some data you already have and change it this way, put it here.}
 
 \item{method}{Either add values recursively by tail branch length (default), or alternative "path" - which adds values proportional to total path length.}
+
+\item{standardise}{Logical, whether or not to z-standardise the data. Defaults to TRUE}
 }
 \description{
 Simulate data over a phylogeny, or sub section of a phylogeny, in order to reflect variable rates.
