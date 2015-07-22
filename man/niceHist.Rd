@@ -4,10 +4,16 @@
 \alias{niceHist}
 \title{niceHist}
 \usage{
-niceHist(parameter, fill = "dodgerblue", breaks = "scott")
+niceHist(parameter, fill = "dodgerblue", breaks = "scott", title = "")
 }
 \arguments{
 \item{parameter}{The a vecotr of values that you want a histogram of.}
+
+\item{fill}{The colour to fill the bars with}
+
+\item{breaks}{The algorithgm to calculate breaks. Defaults to "scott", can also be "fandd"}
+
+\item{title}{The title of the plot, defaults to off.}
 }
 \value{
 A histogram with nice ggplot aesthetics, and good bin widths.

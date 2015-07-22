@@ -4,11 +4,15 @@
 #' but has sensible break behaviour in R. Produces a single
 #' histogram but is mostly called internally for things like
 #' plotPosts.
+#' @name niceHist
 #' @param parameter The a vecotr of values that you want a histogram of.
+#' @param fill The colour to fill the bars with
+#' @param breaks The algorithgm to calculate breaks. Defaults to "scott", can also be "fandd"
+#' @param title The title of the plot, defaults to off.
 #' @return A histogram with nice ggplot aesthetics, and good bin widths.
 #' @export
 
-niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott") {
+niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "") {
   dat <- parameter[!is.na(parameter)]
   
   if (breaks == "scott") {
@@ -21,10 +25,12 @@ niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott") {
     
   if (fill == "count") {
     ggplot(data.frame(parameter = dat), aes(x = parameter, fill = ..count..)) +
-      geom_histogram(color = "darkgray", binwidth = bwidth)
+      geom_histogram(color = "darkgray", binwidth = bwidth) +
+      ggtitle(title)
   } else {
     ggplot(data.frame(parameter = dat), aes(x = parameter)) +
-      geom_histogram(color = "darkgray", fill = fill, binwidth = bwidth)
+      geom_histogram(color = "darkgray", fill = fill, binwidth = bwidth) +
+      ggtitle(title)
   }
 }
 
