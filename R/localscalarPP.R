@@ -10,7 +10,7 @@
 localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
   # load the sample of trees.
   extree <- tree
-  rjout <- loadRJ(rjlog)
+  rjout <- loadRJ(rjlog, burnin = burnin)
 
   ratesperit <- vector(mode = "list", length = nrow(rjout$rj_output))
 
@@ -45,7 +45,6 @@ localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
     "nScalar", "nRate", "nDelta", "nKappa", "nLambda")
 
   for (i in 1:length(ratesperit)) {
-    print(paste("i =", i))
     rates <- ratesperit[[i]]
 
     # make a list of all the branches, as defined by descendent node, with a column of zeroes for any scalar, rate, delta, 
@@ -102,6 +101,7 @@ localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
         comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
         comptable[rws & comptable[ , "lambda"] == 0, "lambda"] <- 1
       }
+    
     }
 
     # Count up generations when scaling occurred.
