@@ -4,7 +4,7 @@
 \alias{loadRJ}
 \title{loadRJ}
 \usage{
-loadRJ(logfile)
+loadRJ(logfile, burnin = 0)
 }
 \arguments{
 \item{logfile}{The name of the logfile of the BayesTraits analysis.}
