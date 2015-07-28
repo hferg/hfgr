@@ -7,7 +7,7 @@
 #' @return A list containing the taxa translation table, all possible subtrees a scalar can occur on, and a data frame of the rj model configuration.
 #' @export
 
-loadRJ <- function(logfile, burnin = 0) {
+loadRJ <- function(logfile, burnin = 0, thinning = 1) {
 
   raw <- readLines(logfile)
   rawhead <- strsplit(raw[1:(grep("\\bIt*\\b", raw) -1)], "\t")
@@ -46,7 +46,7 @@ loadRJ <- function(logfile, burnin = 0) {
   }
   
   output <- do.call(smartBind, rawtail)
-  output <- output[c(burnin:nrow(output)), ]
+  output <- output[seq.int(burnin, nrow(output), thinning), ]
   output <- data.frame(output[2:nrow(output), ], stringsAsFactors = FALSE)
   subtrees <- do.call(smartBind, subtrees)
   subtrees <- data.frame(subtrees, stringsAsFactors = FALSE)
