@@ -1,44 +1,34 @@
 #' meanbranches
 #'
 #' Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.
-#' @param trees An object of class multiPhylo - each tree must have the same topology.
-#' @param ladderize Ladderize the input trees or not
-#' @param returntree Return the mean branch-lengthed tree or not? Defaults to FALSE, and only works if topologies are identical between trees.
+#' @param reftree A tree that provides the reference topology (ideally the tree the analysis was run on)
+#' @param trees The posterior sample of stretched trees from which you want the mean branch lengths.
 #' @export
 
-meanBranches <- function(trees, ladderize = FALSE, returntree = FALSE) {
-  # gather all the edge.lengths into a list.
-  bls <- list()
-  if (ladderize == TRUE) {
+meanBranches <- function(reftree, trees) {
 
-    for (i in 1:length(trees)) {
-      bls[[i]] <- ladderize(trees[[i]])$edge.length
-    }
-      
-    res <- colMeans(do.call(rbind, bls))
-    
-    if (returntree) {
-      tree <- ladderize(trees[[1]])
-      tree$edge.length <- res
-      res <- list(bls = bls, tree = tree)
-    }
-    
-  } else {
+  reftree <- ladderize(reftree)
 
-    for (i in 1:length(trees)) {
-      bls[[i]] <- trees[[i]]$edge.length
+  bls <- vector(mode = "numeric", length = length(reftree$edge.length))
+  
+  for (i in 1:length(trees)) {
+    tree <- ladderize(trees[[i]])
+    
+    if (sum(reftree$tip.label == tree$tip.label) != length(reftree$tip.label)) {
+      stop(paste("Tip labels on tree", i, "do not mactch reference tree"))
     }
     
-    res <- colMeans(do.call(rbind, bls))
-    
-    if (returntree) {
-      tree <- trees[[1]]
-      tree$edge.length <- res
-      res <- list(bls = bls, tree = tree)
+    if (sum(reftree$edge == tree$edge) != length(reftree$edge)) {
+      stop(paste("Tree", i, "has a different topology to reference tree"))
     }
-        
+    
+    bls <- bls + tree$edge.length
+    
   }
-    
+  
+  bls <- bls / length(trees)
+  res <- reftree
+  res$edge.length <- bls
   return(res)
 }
 
