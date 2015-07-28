@@ -5,10 +5,12 @@
 #' @param trees The posterior sample of stretched trees from which you want the mean branch lengths.
 #' @export
 
-meanBranches <- function(reftree, trees) {
+meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
 
   reftree <- ladderize(reftree)
-
+  
+  trees <- trees[seq.int(burnin, length(trees), thinning)]
+  
   bls <- vector(mode = "numeric", length = length(reftree$edge.length))
   
   for (i in 1:length(trees)) {

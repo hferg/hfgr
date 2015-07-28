@@ -10,7 +10,7 @@
 localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
   # load the sample of trees.
   extree <- tree
-  rjout <- loadRJ(rjlog, burnin = burnin)
+  rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
 
   ratesperit <- vector(mode = "list", length = nrow(rjout$rj_output))
 

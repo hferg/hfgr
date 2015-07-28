@@ -1,9 +1,0 @@
-#' processRJ
-#'
-#' This is just a list of ideas for functions to help process RJ outputs.
-
-#' 1) Calculate mean branch lengths for the posterior of scaled trees.
-
-#' 2) Plot those mean branch lengths against the branch lengths of the tree that I simulated the data on.
-
-#' 3) Show how frequently each node had a scalar applied to it.
