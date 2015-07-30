@@ -29,8 +29,9 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
   }
   
   bls <- bls / length(trees)
-  res <- reftree
-  res$edge.length <- bls
+  restree <- reftree
+  restree$edge.length <- bls
+  res <- list(ogtree = reftree, meantree = restree)
   return(res)
 }
 

@@ -18,19 +18,24 @@ localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
 
     lastrates <- rjout$rj_output[i, !is.na(rjout$rj_output[i, ])]
     
-    int <- lastrates[8:length(lastrates)]
+    if (ncol(lastrates) == 7) {
+      node <- NA
+      scale <- NA
+      created <- NA
+      nodebranchdelta <- NA
+    } else {
+      
+      int <- lastrates[8:length(lastrates)]
 
-    scalars <- matrix(ncol = 4, nrow = length(int) / 4)
+      node <- unlist(c(int[grep("NodeID*", names(int))]))
+      scale <- unlist(c(int[grep("Scale*", names(int))]))
+      created <- unlist(c(int[grep("CreatIt*", names(int))]))
+      nodebranchdelta <- unlist(c(int[grep("NodeBranch*", names(int))]))
     
-    node <- unlist(c(int[grep("NodeID*", names(int))]))
-    scale <- unlist(c(int[grep("Scale*", names(int))]))
-    created <- unlist(c(int[grep("CreatIt*", names(int))]))
-    nodebranchdelta <- unlist(c(int[grep("NodeBranch*", names(int))]))
-
+    }
     scalars <- data.frame(node = node, scale = scale, created = created, nodebranchdelta = nodebranchdelta)
     
     ratesperit[[i]] <- scalars
-
   }
 
   # Get per-branch statistics.
