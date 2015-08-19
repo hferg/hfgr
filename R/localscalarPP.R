@@ -5,6 +5,7 @@
 #' @param tree The tree the analysis was run on
 #' @param burnin The burnin (if required) for the mcmc (generally worked out from the other logfile)
 #' @param thinning Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.
+#' @export
 #' @name localscalarPP
 
 localscalarPP <- function(rjlog, tree, burnin = 0, thinning = 1) {
