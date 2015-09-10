@@ -222,14 +222,14 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   for (i in 1:length(rates)) {
     if (is.null(rates[[i]])) {
       rates[[i]] <- 1
-    }
-      dens <- density(rates[[i]])
+    }     
       counts[i, "rangeRate"] <- max(rates[[i]]) - min(rates[[i]])
       counts[i, "lqRate"] <- quantile(rates[[i]])[2]
       counts[i, "uqRate"] <- quantile(rates[[i]])[4]
       counts[i, "meanRate"] <- mean(rates[[i]])
       counts[i, "medianRate"] <- median(rates[[i]])
       if (length(rates[[i]]) > 1) {
+        dens <- density(rates[[i]])
         counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
         counts[i, "modeRate"] <- NA
@@ -239,14 +239,14 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   for (i in 1:length(deltas)) {
     if (is.null(deltas[[i]])) {
       deltas[[i]] <- 1
-    }
-      dens <- density(deltas[[i]])
+    }      
       counts[i, "rangeDelta"] <- max(deltas[[i]]) - min(deltas[[i]])
       counts[i, "lqDelta"] <- quantile(deltas[[i]])[2]
       counts[i, "uqDelta"] <- quantile(deltas[[i]])[4]
       counts[i, "meanDelta"] <- mean(deltas[[i]])
       counts[i, "medianDelta"] <- median(deltas[[i]])
       if (length(deltas[[i]]) > 1) {
+        dens <- density(deltas[[i]])
         counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
         counts[i, "modeDelta"] <- NA
@@ -257,13 +257,13 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     if (is.null(kappas[[i]])) {
       kappas[[i]] <- 1
     }
-      dens <- density(kappas[[i]])
       counts[i, "rangeKappa"] <- max(kappas[[i]]) - min(kappas[[i]])
       counts[i, "lqKappa"] <- quantile(kappas[[i]])[2]
       counts[i, "uqKappa"] <- quantile(kappas[[i]])[4]
       counts[i, "meanKappa"] <- mean(kappas[[i]])
       counts[i, "medianKappa"] <- median(kappas[[i]])
       if (length(kappas[[i]]) > 1) {
+        dens <- density(kappas[[i]])
         counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
         counts[i, "modeKappa"] <- NA
@@ -274,13 +274,13 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     if (!is.null(lambdas[[i]])) {
       lambdas[[i]] <- 1
     }
-      dens <- density(lambdas[[i]])
       counts[i, "rangeLambda"] <- max(lambdas[[i]]) - min(lambdas[[i]])
       counts[i, "lqLambda"] <- quantile(lambdas[[i]])[2]
       counts[i, "uqLambda"] <- quantile(lambdas[[i]])[4]
       counts[i, "meanLambda"] <- mean(lambdas[[i]])
       counts[i, "medianLambda"] <- median(lambdas[[i]])
       if (length(lambdas[[i]]) > 1) {  
+        dens <- density(lambdas[[i]])
         counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
         counts[i, "modeLambda"] <- NA
