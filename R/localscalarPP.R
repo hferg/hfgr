@@ -290,10 +290,16 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   # Finally remove zero columns.
   keeps <- NULL
   for (i in 1:ncol(counts)) {
+    if (all(is.na(counts[ , i]))) {
+      counts[ , i] <- 0
+    }
+  }
+
+  for (i in 1:ncol(counts)) {
     if (any(counts[ , i] != 0)) {
       keeps <- c(keeps, i)
     }
   }
-  counts1 <- counts[ , keeps]
+  counts <- counts[ , keeps]
   return(counts)
 }
