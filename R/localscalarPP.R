@@ -229,7 +229,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "uqRate"] <- quantile(rates[[i]])[4]
       counts[i, "meanRate"] <- mean(rates[[i]])
       counts[i, "medianRate"] <- median(rates[[i]])
-      counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
+      if (length(rates[[i]]) > 1) {
+        counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
+      } else {
+        counts[i, "modeRate"] <- NA
+      }
   }
 
   for (i in 1:length(deltas)) {
@@ -242,7 +246,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "uqDelta"] <- quantile(deltas[[i]])[4]
       counts[i, "meanDelta"] <- mean(deltas[[i]])
       counts[i, "medianDelta"] <- median(deltas[[i]])
-      counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
+      if (length(deltas[[i]]) > 1) {
+        counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
+      } else {
+        counts[i, "modeDelta"] <- NA
+      }
   }
 
   for (i in 1:length(kappas)) {
@@ -255,7 +263,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "uqKappa"] <- quantile(kappas[[i]])[4]
       counts[i, "meanKappa"] <- mean(kappas[[i]])
       counts[i, "medianKappa"] <- median(kappas[[i]])
-      counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
+      if (length(kappas[[i]]) > 1) {
+        counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
+      } else {
+        counts[i, "modeKappa"] <- NA
+      }
   }
 
   for (i in 1:length(lambdas)) {
@@ -268,7 +280,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "uqLambda"] <- quantile(lambdas[[i]])[4]
       counts[i, "meanLambda"] <- mean(lambdas[[i]])
       counts[i, "medianLambda"] <- median(lambdas[[i]])
-      counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
+      if (length(lambdas[[i]]) > 1) {  
+        counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
+      } else {
+        counts[i, "modeLambda"] <- NA
+      }
   }
 
   # Finally remove zero columns.
