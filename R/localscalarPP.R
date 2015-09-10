@@ -86,7 +86,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     counts[i, "mid"] <- mean(c(hts[i, 1], hts[i, 2]))
   }
   
-  counts[ , c(9:44)] <- 0
+  counts[ , c(11:44)] <- 0
 
   # Make tables to store the individual deltas and whatever for each iteration.
   # How to do this? I can't just have onc cell per branch per iteration - that's no good.
@@ -220,7 +220,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   # First add in 1 where there is a NULL.
 
   for (i in 1:length(rates)) {
-    if (!is.null(rates[[i]])) {
+    if (is.null(rates[[i]])) {
+      rates[[i]] <- 1
+    }
       dens <- density(rates[[i]])
       counts[i, "rangeRate"] <- max(rates[[i]]) - min(rates[[i]])
       counts[i, "lqRate"] <- quantile(rates[[i]])[2]
@@ -228,11 +230,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "meanRate"] <- mean(rates[[i]])
       counts[i, "medianRate"] <- median(rates[[i]])
       counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
-    }
   }
 
   for (i in 1:length(deltas)) {
-    if (!is.null(deltas[[i]])) {
+    if (is.null(deltas[[i]])) {
+      deltas[[i]] <- 1
+    }
       dens <- density(deltas[[i]])
       counts[i, "rangeDelta"] <- max(deltas[[i]]) - min(deltas[[i]])
       counts[i, "lqDelta"] <- quantile(deltas[[i]])[2]
@@ -240,11 +243,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "meanDelta"] <- mean(deltas[[i]])
       counts[i, "medianDelta"] <- median(deltas[[i]])
       counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
-    }
   }
 
   for (i in 1:length(kappas)) {
-    if (!is.null(kappas[[i]])) {
+    if (is.null(kappas[[i]])) {
+      kappas[[i]] <- 1
+    }
       dens <- density(kappas[[i]])
       counts[i, "rangeKappa"] <- max(kappas[[i]]) - min(kappas[[i]])
       counts[i, "lqKappa"] <- quantile(kappas[[i]])[2]
@@ -252,11 +256,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "meanKappa"] <- mean(kappas[[i]])
       counts[i, "medianKappa"] <- median(kappas[[i]])
       counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
-    }
   }
 
   for (i in 1:length(lambdas)) {
     if (!is.null(lambdas[[i]])) {
+      lambdas[[i]] <- 1
+    }
       dens <- density(lambdas[[i]])
       counts[i, "rangeLambda"] <- max(lambdas[[i]]) - min(lambdas[[i]])
       counts[i, "lqLambda"] <- quantile(lambdas[[i]])[2]
@@ -264,7 +269,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       counts[i, "meanLambda"] <- mean(lambdas[[i]])
       counts[i, "medianLambda"] <- median(lambdas[[i]])
       counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
-    }
   }
 
   # Finally remove zero columns.
@@ -274,7 +278,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       keeps <- c(keeps, i)
     }
   }
-
-  counts <- counts[ , keeps]
+  counts1 <- counts[ , keeps]
   return(counts)
 }
