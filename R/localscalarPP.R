@@ -271,7 +271,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   }
 
   for (i in 1:length(lambdas)) {
-    if (!is.null(lambdas[[i]])) {
+    if (is.null(lambdas[[i]])) {
       lambdas[[i]] <- 1
     }
       counts[i, "rangeLambda"] <- max(lambdas[[i]]) - min(lambdas[[i]])
@@ -293,6 +293,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     if (all(is.na(counts[ , i]))) {
       counts[ , i] <- 0
     }
+    if (all(counts[ , i] == 1)) {
+      counts[ , i] <- 0
+    }    
   }
 
   for (i in 1:ncol(counts)) {
