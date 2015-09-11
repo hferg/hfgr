@@ -257,8 +257,8 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     if (is.null(kappas[[i]])) {
       kappas[[i]] <- 1
     }
-      counts[i, "rangeKappa"] <- max(kappas[[i]]) - min(kappas[[i]])
-      counts[i, "lqKappa"] <- quantile(kappas[[i]])[2]
+      counts[i, "rangeKappa"] <- max(kappas[[i]]) - min(kappas[[i]]
+)      counts[i, "lqKappa"] <- quantile(kappas[[i]])[2]
       counts[i, "uqKappa"] <- quantile(kappas[[i]])[4]
       counts[i, "meanKappa"] <- mean(kappas[[i]])
       counts[i, "medianKappa"] <- median(kappas[[i]])
