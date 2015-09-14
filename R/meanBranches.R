@@ -49,6 +49,6 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
 
   restree <- reftree
   restree$edge.length <- branches
-  res <- list(ogtree = reftree, meantree = restree, quartileranges = quarts, rangescalar = rangebl)
+  res <- list(ogtree = reftree, meantree = restree, quart25 = quart25, quart75 = quart75, rangescalar = rangebl)
   return(res)
 }

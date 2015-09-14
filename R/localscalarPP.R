@@ -49,9 +49,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   # Make a table called counts - this has one row per branch, the ancestor and descendant node, and then
   # space for the number of scalars in total, the type of scalars, and the number of generations one or more scalar
   # is applied, as well as space for those scalar types.
-  counts <- matrix(ncol = 46, nrow = nrow(extree$edge))
+  counts <- matrix(ncol = 47, nrow = nrow(extree$edge))
 
-  colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "newBL", "ratioBL", "quantileBL", 
+  colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "newBL", "ratioBL", "quart25", "quart75", 
       "itersScaled", "itersRatescaled", "itersDelta", "itersKappa", "itersLambda", 
       "nScalar", "nRate", "nDelta", "nKappa", "nLambda",
       "rangeRate", "lqRate", "uqRate", "meanRate", "medianRate", "modeRate",
@@ -66,7 +66,8 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   print("Calculating mean branch lengths.")
   meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning)
   counts[ , "newBL"] <- meanbl$meantree$edge.length
-  counts[ , "quantileBL"] <- meanbl$quartilerange
+  counts[ , "quart25"] <- meanbl$quart25
+  counts[ , "quart75"] <- meanbl$quart75
   counts[ , "ratioBL"] <- counts[ , "newBL"] / counts[ , "orgBL"]
 
   hts <- nodeHeights(extree)
@@ -88,7 +89,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     counts[i, "mid"] <- mean(c(hts[i, 1], hts[i, 2]))
   }
   
-  counts[ , c(12:45)] <- 0
+  counts[ , c(13:46)] <- 0
 
   # Make tables to store the individual deltas and whatever for each iteration.
   # How to do this? I can't just have onc cell per branch per iteration - that's no good.
