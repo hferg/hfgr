@@ -8,7 +8,7 @@
 #' @export
 #' @name localscalarPP
 
-localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
+localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type = "mean") {
   # load the sample of trees.
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -64,7 +64,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   counts[ , "descNode"] <- extree$edge[ , 2]
   counts[ , "orgBL"] <- extree$edge.length
   print("Calculating mean branch lengths.")
-  meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning)
+  meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning, type = type)
   counts[ , "newBL"] <- meanbl$meantree$edge.length
   counts[ , "quart25"] <- meanbl$quart25
   counts[ , "quart75"] <- meanbl$quart75

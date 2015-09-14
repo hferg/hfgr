@@ -1,10 +1,11 @@
-#' meanbranches#'
+#' meanbranches
+#'
 #' Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.
 #' @param reftree A tree that provides the reference topology (ideally the tree the analysis was run on)
 #' @param trees The posterior sample of stretched trees from which you want the mean branch lengths.
 #' @export
 
-meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
+meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, type = "mean") {
 
   reftree <- ladderize(reftree)
   
@@ -31,9 +32,11 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
   rangebl <- vector(mode = "numeric", length = nrow(bls)) 
   quart25 <- vector(mode = "numeric", length = nrow(bls))
   quart75 <- vector(mode = "numeric", length = nrow(bls))
-  branches <- vector(mode = "numeric", length(nrow(bls)))
+  branchesmean <- vector(mode = "numeric", length(nrow(bls)))
+  branchesmedian <- vector(mode = "numeric", length(nrow(bls)))
   for (i in 1:nrow(bls)) {
-    branches[i] <- mean(bls[i, ])
+    branchesmean[i] <- mean(bls[i, ])
+    branchesmedian[i] <- median(bls[i, ])
   }
 
   for (i in 1:ncol(bls)) {
@@ -48,7 +51,12 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
   }
 
   restree <- reftree
-  restree$edge.length <- branches
+  if (type == "mean") {
+    restree$edge.length <- branchesmean
+  }
+  if (type == "median") {
+    restree$edge.length <- branchesmedian
+  }
   res <- list(ogtree = reftree, meantree = restree, quart25 = quart25, quart75 = quart75, rangescalar = rangebl)
   return(res)
 }
