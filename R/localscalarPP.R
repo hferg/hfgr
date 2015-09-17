@@ -8,7 +8,7 @@
 #' @export
 #' @name localscalarPP
 
-localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type = "mean") {
+localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   # load the sample of trees.
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -45,15 +45,19 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type =
     ratesperit[[i]] <- scalars
   }
 
+  # ADJUST HERE IN ORDER TO ADD MEAN AND MEDIAN BLS INSTEAD OF NEW BLS.
   # Get per-branch statistics.
   # Make a table called counts - this has one row per branch, the ancestor and descendant node, and then
   # space for the number of scalars in total, the type of scalars, and the number of generations one or more scalar
   # is applied, as well as space for those scalar types.
-  counts <- matrix(ncol = 47, nrow = nrow(extree$edge))
+  counts <- matrix(ncol = 62, nrow = nrow(extree$edge))
 
-  colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "newBL", "ratioBL", "quart25", "quart75", 
+  colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "meanBL", "medianBL", "quart25", "quart75", 
       "itersScaled", "itersRatescaled", "itersDelta", "itersKappa", "itersLambda", 
+      "pScaled", "pRate", "pDelta", "pKappa", "pLambda",
       "nScalar", "nRate", "nDelta", "nKappa", "nLambda",
+      "mnSpI", "mnRpI", "mnDpI", "mnKpI", "mnLpI",
+      "mnSpE", "mnRpE", "mnDpE", "mnKpE", "mnLpE",
       "rangeRate", "lqRate", "uqRate", "meanRate", "medianRate", "modeRate",
       "rangeDelta", "lqDelta", "uqDelta", "meanDelta", "medianDelta", "modeDelta",
       "rangeKappa", "lqKappa", "uqKappa", "meanKappa", "medianKappa", "modeKappa",
@@ -64,11 +68,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type =
   counts[ , "descNode"] <- extree$edge[ , 2]
   counts[ , "orgBL"] <- extree$edge.length
   print("Calculating mean branch lengths.")
-  meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning, type = type)
-  counts[ , "newBL"] <- meanbl$meantree$edge.length
+  meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning)
+  counts[ , "meanBL"] <- meanbl$meanbranches
+  counts[ , "medianBL"] <- meanbl$medianbranches
   counts[ , "quart25"] <- meanbl$quart25
   counts[ , "quart75"] <- meanbl$quart75
-  counts[ , "ratioBL"] <- counts[ , "newBL"] / counts[ , "orgBL"]
 
   hts <- nodeHeights(extree)
   hts <- round(abs(hts - max(hts)), 4)
@@ -89,7 +93,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type =
     counts[i, "mid"] <- mean(c(hts[i, 1], hts[i, 2]))
   }
   
-  counts[ , c(13:46)] <- 0
+  counts[ , c(13:61)] <- 0
 
   # Make tables to store the individual deltas and whatever for each iteration.
   # How to do this? I can't just have onc cell per branch per iteration - that's no good.
@@ -220,6 +224,26 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, type =
     }
   } 
   # Finally generate the descriptive stuff for the scalar values, and remove columns that are all zero.
+  # Before all this it is pretty straight forward to calculate the probs for each scalar.
+  counts[ , "pScaled"] <- counts[ , "itersScaled"] / length(ratesperit)
+  counts[ , "pRate"] <- counts[ , "itersRatescaled"] / length(ratesperit)
+  counts[ , "pDelta"] <- counts[ , "itersDelta"] / length(ratesperit)
+  counts[ , "pKappa"] <- counts[ , "itersKappa"] / length(ratesperit)
+  counts[ , "pLambda"] <- counts[ , "itersLambda"] / length(ratesperit)
+
+  counts[ , "mnSpI"] <- counts[ , "nScalar"] / length(ratesperit)
+  counts[ , "mnRpI"] <- counts[ , "nRate"] / length(ratesperit)
+  counts[ , "mnDpI"] <- counts[ , "nDelta"] / length(ratesperit)
+  counts[ , "mnKpI"] <- counts[ , "nKappa"] / length(ratesperit)
+  counts[ , "mnLpI"] <- counts[ , "nLambda"] / length(ratesperit)
+
+  counts[ , "mnSpE"] <- counts[ , "nScalar"] / counts[ , "itersScaled"]
+  counts[ , "mnRpE"] <- counts[ , "nRate"] / counts[ , "itersratescaled"]
+  counts[ , "mnDpE"] <- counts[ , "nDelta"] / counts[ , "itersDelta"]
+  counts[ , "mnKpE"] <- counts[ , "nKappa"] / counts[ , "itersKappa"]
+  counts[ , "mnLpE"] <- counts[ , "nLambda"] / counts[ , "itersLambda"]
+
+
   # First add in 1 where there is a NULL.
 
   for (i in 1:length(rates)) {

@@ -5,7 +5,7 @@
 #' @param trees The posterior sample of stretched trees from which you want the mean branch lengths.
 #' @export
 
-meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, type = "mean") {
+meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
 
   reftree <- ladderize(reftree)
   
@@ -37,26 +37,17 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, type = "mean"
   for (i in 1:nrow(bls)) {
     branchesmean[i] <- mean(bls[i, ])
     branchesmedian[i] <- median(bls[i, ])
-  }
-
-  for (i in 1:ncol(bls)) {
-    bls[ , i] <- bls [ , i] / reftree$edge.length
-  }
-
-  for (i in 1:nrow(bls)) {
     quarts <- sort(bls[i, ])
     quart25[i] <- quarts[round(length(quarts) * 0.25)]
     quart75[i] <- quarts[round(length(quarts) * 0.75)]
     rangebl[i] <- max(bls[i, ]) - min(bls[i, ])
   }
 
-  restree <- reftree
-  if (type == "mean") {
-    restree$edge.length <- branchesmean
-  }
-  if (type == "median") {
-    restree$edge.length <- branchesmedian
-  }
-  res <- list(ogtree = reftree, meantree = restree, quart25 = quart25, quart75 = quart75, rangescalar = rangebl)
+  res <- list(ogtree = reftree, 
+              meanbranches = branchesmean, 
+              medianbranches = branchesmedian, 
+              quart25 = quart25, 
+              quart75 = quart75, 
+              rangescalar = rangebl)
   return(res)
 }
