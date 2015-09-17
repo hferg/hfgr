@@ -238,7 +238,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   counts[ , "mnLpI"] <- counts[ , "nLambda"] / length(ratesperit)
 
   counts[ , "mnSpE"] <- counts[ , "nScalar"] / counts[ , "itersScaled"]
-  counts[ , "mnRpE"] <- counts[ , "nRate"] / counts[ , "itersratescaled"]
+  counts[ , "mnRpE"] <- counts[ , "nRate"] / counts[ , "itersRatescaled"]
   counts[ , "mnDpE"] <- counts[ , "nDelta"] / counts[ , "itersDelta"]
   counts[ , "mnKpE"] <- counts[ , "nKappa"] / counts[ , "itersKappa"]
   counts[ , "mnLpE"] <- counts[ , "nLambda"] / counts[ , "itersLambda"]
