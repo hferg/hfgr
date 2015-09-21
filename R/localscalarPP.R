@@ -8,7 +8,7 @@
 #' @export
 #' @name localscalarPP
 
-localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
+localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, returnscales = FALSE) {
   # load the sample of trees.
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -50,12 +50,13 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   # Make a table called counts - this has one row per branch, the ancestor and descendant node, and then
   # space for the number of scalars in total, the type of scalars, and the number of generations one or more scalar
   # is applied, as well as space for those scalar types.
-  counts <- matrix(ncol = 62, nrow = nrow(extree$edge))
+  counts <- matrix(ncol = 68, nrow = nrow(extree$edge))
 
   colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "meanBL", "medianBL", "quart25", "quart75", 
       "itersScaled", "itersRatescaled", "itersDelta", "itersKappa", "itersLambda", 
       "pScaled", "pRate", "pDelta", "pKappa", "pLambda",
       "nScalar", "nRate", "nDelta", "nKappa", "nLambda",
+      "nOrgnScalar", "nOrgnNRate", "nOrgnBRate", "nOrgnDelta", "nOrgnKappa", "nOrgnLambda",
       "mnSpI", "mnRpI", "mnDpI", "mnKpI", "mnLpI",
       "mnSpE", "mnRpE", "mnDpE", "mnKpE", "mnLpE",
       "rangeRate", "lqRate", "uqRate", "meanRate", "medianRate", "modeRate",
@@ -93,7 +94,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     counts[i, "mid"] <- mean(c(hts[i, 1], hts[i, 2]))
   }
   
-  counts[ , c(13:61)] <- 0
+  counts[ , c(13:67)] <- 0
 
   # Make tables to store the individual deltas and whatever for each iteration.
   # How to do this? I can't just have onc cell per branch per iteration - that's no good.
@@ -123,22 +124,29 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
         currentnode <- scalars[j, "node"]
         currenttrans <- scalars[j, "nodebranchdelta"]
         currentscale <- as.numeric(as.character(scalars[j, "scale"]))
-        
+
         # Find the taxa numbers that descend from the node that the scalar is applied too.
         taxa <- rjout$subtrees[rjout$subtrees$node == currentnode, ]
         taxa <- taxa[ , !is.na(taxa)]
         taxa <- taxa[c(4:length(taxa))]
         
         # Find the MRCA of those taxa - now the node number (mrca) is in terms of a phylogeny as stored in ape.
-        mrca <- getMRCA(extree, rjout$taxa[rjout$taxa[ , 1] %in% taxa, 2])
-        
+        # If the taxa is a single tip, make that MRCA (this can only apply to branch scalars.)
+        if (length(taxa) == 1) {
+          mrca <- taxa
+        } else {
+          mrca <- getMRCA(extree, rjout$taxa[rjout$taxa[ , 1] %in% taxa, 2])
+        }
+
         # Find out what type of scalar is currently under consideration.
         if (currenttrans == "Node") {
           # If it's a node, the descendents of that node, plus the branch leading to it, need to be considered.
           descs <- c(getDescs(extree, mrca), mrca)
           # Then find branches from descs and count.
           counts[counts[, "descNode"] %in% descs , "nScalar"] <- counts[counts[, "descNode"] %in% descs , "nScalar"] + 1
-          counts[counts[, "descNode"] %in% descs , "nRate"] <- counts[counts[, "descNode"] %in% descs , "nRate"] + 1          
+          counts[counts[, "descNode"] %in% descs , "nRate"] <- counts[counts[, "descNode"] %in% descs , "nRate"] + 1 
+          counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnNRate"] <- counts[counts[, "descNode"] == mrca, "nOrgnNRate"] + 1
           rws <- comptable[ , 1] %in% descs
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
@@ -152,7 +160,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
           descs <- mrca
           rws <- comptable[ , 1] %in% descs
           counts[counts[, "descNode"] == mrca , "nScalar"] <- counts[counts[, "descNode"] == mrca , "nScalar"] + 1
-          counts[counts[, "descNode"] %in% descs , "nRate"] <- counts[counts[, "descNode"] %in% descs , "nRate"] + 1          
+          counts[counts[, "descNode"] %in% descs , "nRate"] <- counts[counts[, "descNode"] %in% descs , "nRate"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnBRate"] <- counts[counts[, "descNode"] == mrca, "nOrgnBRate"] + 1          
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the deltas.
@@ -162,13 +172,15 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
         }
         if (currenttrans == "Delta") {
           # Define the branches (as descendent nodes) that were scaled.
-          descs <- getDescs(extree, mrca)
+          descs <- c(getDescs(extree, mrca), mrca)
           # Get rows of the table that need to have the sount increased.
           rws <- comptable[ , 1] %in% descs
           # Increase the number of deltas for each node in this scalar by 1, in the counts table, and 
           # the total number of scalars.
           counts[counts[, "descNode"] %in% descs , "nScalar"] <- counts[counts[, "descNode"] %in% descs , "nScalar"] + 1
           counts[counts[, "descNode"] %in% descs , "nDelta"] <- counts[counts[, "descNode"] %in% descs , "nDelta"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnDelta"] <- counts[counts[, "descNode"] == mrca, "nOrgnDelta"] + 1
           # Then adjust the comptable to a) record yes or no for being scaled at all, and b) record 
           # yes or no for each of the scalars.
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
@@ -180,10 +192,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
           }
         }
         if (currenttrans == "Kappa") {
-          descs <- getDescs(extree, mrca)
+          descs <- c(getDescs(extree, mrca), mrca)
           rws <- comptable[ , 1] %in% descs
           counts[counts[, "descNode"] %in% descs , "nScalar"] <- counts[counts[, "descNode"] %in% descs , "nScalar"] + 1
           counts[counts[, "descNode"] %in% descs , "nKappa"] <- counts[counts[, "descNode"] %in% descs , "nKappa"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnKappa"] <- counts[counts[, "descNode"] == mrca, "nOrgnKappa"] + 1
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "kappa"] == 0, "kappa"] <- 1
           # Finally record the kappas.
@@ -192,10 +206,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
           }
         }    
         if (currenttrans == "Lambda") {
-          descs <- getDescs(extree, mrca)
+          descs <- c(getDescs(extree, mrca), mrca)
           rws <- comptable[ , 1] %in% descs
           counts[counts[, "descNode"] %in% descs , "nScalar"] <- counts[counts[, "descNode"] %in% descs , "nScalar"] + 1
           counts[counts[ , "descNode"] %in% descs , "nLambda"] <- counts[counts[, "descNode"] %in% descs , "nLambda"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
+          counts[counts[, "descNode"] == mrca, "nOrgnLambda"] <- counts[counts[, "descNode"] == mrca, "nOrgnLambda"] + 1
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "lambda"] == 0, "lambda"] <- 1
           # Finally record the lambdas.
@@ -331,5 +347,10 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     }
   }
   counts <- counts[ , keeps]
-  return(counts)
+  if (returnscales = TRUE) {
+    res <- list(data = counts, rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
+  } else {
+    res <- counts
+  }
+  return(res)
 }
