@@ -4,7 +4,8 @@
 \alias{localscalarPP}
 \title{localscalarPP}
 \usage{
-localscalarPP(rjlog, rjtrees, tree, burnin = 0, thinning = 1)
+localscalarPP(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
+  returnscales = FALSE)
 }
 \arguments{
 \item{rjlog}{The RJ output of the run - typically suffixed with .VarRates.txt}

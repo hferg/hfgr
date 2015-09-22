@@ -5,6 +5,7 @@
 #' @param tree The tree the analysis was run on
 #' @param burnin The burnin (if required) for the mcmc (generally worked out from the other logfile)
 #' @param thinning Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.
+#' @import phytools
 #' @export
 #' @name localscalarPP
 
@@ -347,7 +348,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     }
   }
   counts <- counts[ , keeps]
-  if (returnscales = TRUE) {
+  if (returnscales == TRUE) {
     res <- list(data = counts, rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
   } else {
     res <- counts
