@@ -5,6 +5,7 @@
 #' @param tree The tree the analysis was run on
 #' @param burnin The burnin (if required) for the mcmc (generally worked out from the other logfile)
 #' @param thinning Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.
+#' @param returnscales A vector of descendant nodes describing branches for which to return full distributions of scalars for.
 #' @import phytools
 #' @export
 #' @name localscalarPP
@@ -51,7 +52,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   # Make a table called counts - this has one row per branch, the ancestor and descendant node, and then
   # space for the number of scalars in total, the type of scalars, and the number of generations one or more scalar
   # is applied, as well as space for those scalar types.
-  counts <- matrix(ncol = 68, nrow = nrow(extree$edge))
+
+  # TODO: I need to add in something to accommodate the root here. It will be the partition in Andrews thing with all
+  #   taxa.
+
+  counts <- matrix(ncol = 68, nrow = (nrow(extree$edge) + 1))
 
   colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "meanBL", "medianBL", "quart25", "quart75", 
       "itersScaled", "itersRatescaled", "itersDelta", "itersKappa", "itersLambda", 
@@ -65,25 +70,29 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       "rangeKappa", "lqKappa", "uqKappa", "meanKappa", "medianKappa", "modeKappa",
       "rangeLambda", "lqLambda", "uqLambda", "meanLambda", "medianLambda", "modeLambda", "species")
 
-  counts[ , "branch"] <- c(1:nrow(extree$edge))
-  counts[ , "ancNode"] <- extree$edge[ , 1]
-  counts[ , "descNode"] <- extree$edge[ , 2]
-  counts[ , "orgBL"] <- extree$edge.length
+  counts[ , "branch"] <- c(0:nrow(extree$edge))
+  counts[ , "ancNode"] <- c(0, extree$edge[ , 1])
+  counts[ , "descNode"] <- c((length(tree$tip.label) + 1), extree$edge[ , 2])
+  counts[ , "orgBL"] <- c(0, extree$edge.length)
   print("Calculating mean branch lengths.")
   meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning)
-  counts[ , "meanBL"] <- meanbl$meanbranches
-  counts[ , "medianBL"] <- meanbl$medianbranches
-  counts[ , "quart25"] <- meanbl$quart25
-  counts[ , "quart75"] <- meanbl$quart75
+  counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
+  counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
+  counts[ , "quart25"] <- c(0, meanbl$quart25)
+  counts[ , "quart75"] <- c(0, meanbl$quart75)
 
   hts <- nodeHeights(extree)
   hts <- round(abs(hts - max(hts)), 4)
-  counts[ , "start"] <- hts[ , 1]
-  counts[ , "end"] <- hts[ , 2]
-  counts[ , "mid"] <- mean(c(hts[ , 1]))
+  counts[ , "start"] <- c(0, hts[ , 1])
+  counts[ , "end"] <- c(0, hts[ , 2])
   counts <- as.data.frame(counts)
 
-  for (i in 1:nrow(counts)) {
+  # Deal with the root
+  descs <- getDescs(extree, node = counts[1, "descNode"])
+  counts[1, "nTips"] <- sum(descs <= length(tree$tip.label))
+  counts[1, "mid"] <- 0
+
+  for (i in 2:nrow(counts)) {
     descs <- getDescs(extree, node = counts[i, "descNode"])
     counts[i, "nTips"] <- sum(descs <= length(tree$tip.label))
     if (counts[i, "nTips"] == 0) {
@@ -92,7 +101,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     if (counts[i, "descNode"] <= length(extree$tip.label)) {
       counts[i, "species"] <- extree$tip.label[counts[i, "descNode"]]
     }
-    counts[i, "mid"] <- mean(c(hts[i, 1], hts[i, 2]))
+    counts[i, "mid"] <- mean(c(hts[(i - 1), 1], hts[(i - 1), 2]))
   }
   
   counts[ , c(13:67)] <- 0
@@ -115,14 +124,15 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     # kappa and lambda. These become ones when a scalar is place.
      if (!all(is.na(ratesperit[[i]]))) {
       # Generate the table to store the current scalar of the current iteration.
-      comptable <- matrix(ncol = 6, nrow = nrow(extree$edge))
-      comptable[ , 1] <- extree$edge[ , 2]  
+      comptable <- matrix(ncol = 6, nrow = (nrow(extree$edge) + 1))
+      comptable[1, 1] <- length(tree$tip.label) + 1
+      comptable[c(2:nrow(comptable)) , 1] <- extree$edge[ , 2]  
       comptable[ , c(2:6)] <- 0
       colnames(comptable) <- c("descNode", "totalscalar", "rate", "delta", "kappa", "lambda")
       
       for (j in 1:nrow(scalars)) {
         # Get the node the scalar applies to, and the type of scalar.
-        currentnode <- scalars[j, "node"]
+        currentnode <- scalars[j, "node"]      
         currenttrans <- scalars[j, "nodebranchdelta"]
         currentscale <- as.numeric(as.character(scalars[j, "scale"]))
 
@@ -239,7 +249,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       tmp <- counts[ , "descNode"] %in% comptable[comptable[ , "lambda"] == 1, "descNode"]
       counts[tmp, "itersLambda"] <- counts[tmp, "itersLambda"] + 1
     }
-  } 
+  }
   # Finally generate the descriptive stuff for the scalar values, and remove columns that are all zero.
   # Before all this it is pretty straight forward to calculate the probs for each scalar.
   counts[ , "pScaled"] <- counts[ , "itersScaled"] / length(ratesperit)
