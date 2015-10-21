@@ -19,6 +19,7 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
   max <- maxtax
   trees <- vector(mode = "list", length = itts)
   for (i in 1:itts) {
+    print(i)
     tree <- sim.bd.taxa(treesize, numbsim = 1, lambda = 0.2, mu = 0.01, complete = FALSE)[[1]]
     tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
     nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
@@ -147,6 +148,7 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
         dat <- as.data.frame(cbind(t1$states, t2$states))
 
         for (k in 1:length(changetrees)) {
+          print(k)
         
           Q_dep <- matrix(c(0, 0.4, 0.4, 0,
                             2, 0,   0,   2,
@@ -168,14 +170,45 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
           # root node.
 
           tts <- sim.history(changetrees[[k]], Q_dep, anc = root)
-          t1 <- mergeMappedStates(tts, c("aa", "ab"), "a")
-          t1 <- mergeMappedStates(t1, c("ba", "bb"), "b")
-          t2 <- mergeMappedStates(tts, c("aa", "ba"), "a")
-          t2 <- mergeMappedStates(t2, c("ab", "bb"), "b")
-          t1$states <- getStates(t1, "tips")
-          t2$states <- getStates(t2, "tips")
+          
+          if (any(tts$states == "aa")) {
+            t11 <- mergeMappedStates(tts, "aa", "a")
+          }
 
-          tmp <- as.data.frame(cbind(t1$states, t2$states))
+          if (any(t11$states == "ab")) {
+            t11 <- mergeMappedStates(t11, "ab", "a")
+          }
+          
+          if (any(t11$states == "ba")) {
+            t11 <- mergeMappedStates(t11, "ba", "b")
+          }
+
+          if (any(t11$states == "bb")) {
+            t11 <- mergeMappedStates(t11, "bb", "b")
+          }
+          
+          if (any(tts$states == "aa")) {
+            t22 <- mergeMappedStates(tts, "aa", "a")
+          }
+
+          if (any(t22$states == "ba")) {
+            t22 <- mergeMappedStates(t22, "ba", "a")
+          }
+          
+          if (any(t22$states == "ab")) {
+            t22 <- mergeMappedStates(t22, "ab", "b")
+          }
+
+          if (any(t22$states == "bb")) {
+            t22 <- mergeMappedStates(t22, "bb", "b")
+          }
+          
+
+          
+          t11$states <- getStates(t11, "tips")
+          t22$states <- getStates(t22, "tips")
+
+          tmp <- as.data.frame(cbind(t11$states, t22$states))
           # Now merge these states back into the original data.
           dat[rownames(dat) %in% rownames(tmp), "V1"] <- tmp$V1
           dat[rownames(dat) %in% rownames(tmp), "V2"] <- tmp$V2
@@ -194,5 +227,6 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
 
     trees[[i]] <- list(tree = tree, data = dat, changed_nodes = change_nodes)
   }
+  
   return(trees)
 }
