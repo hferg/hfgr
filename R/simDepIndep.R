@@ -15,73 +15,72 @@
 #' @param base_mode The model for the whole tree that the clades vary from. E.g. if "dependent" then the tree will be a dependent model, with n clades evolved as independent. If "independent" than vice versa.
 
 simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
-  min <- mintax
-  max <- maxtax
   trees <- vector(mode = "list", length = itts)
   for (i in 1:itts) {
-    print(i)
-    tree <- sim.bd.taxa(treesize, numbsim = 1, lambda = 0.2, mu = 0.01, complete = FALSE)[[1]]
-    tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
-    nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
-    colnames(nodes) <- c("Node", "nTips")
-    nodes[ , 1] <- tree$edge[ , 2]
+    candidates <- 0
+    while (length(candidates) < clades) {
+      tree <- sim.bd.taxa(treesize, numbsim = 1, lambda = 0.2, mu = 0.01, complete = FALSE)[[1]]
+      tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
+      nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
+      colnames(nodes) <- c("Node", "nTips")
+      nodes[ , 1] <- tree$edge[ , 2]
 
-    for (k in 1:nrow(nodes)) {
-      nodes[k, 2] <- sum(getDescs(tree, nodes[k, 1]) < length(tree$tip.label)) 
-    }
+      for (k in 1:nrow(nodes)) {
+        nodes[k, 2] <- sum(getDescs(tree, nodes[k, 1]) < length(tree$tip.label)) 
+      }
 
-    # Find two clades that have ~ 30 tips.
-    candidates <- nodes[nodes[ , "nTips"] >= min & nodes[ , "nTips"] <= max, "Node"]
+      # Find two clades that have ~ 30 tips.
+      candidates <- nodes[nodes[ , "nTips"] >= mintax & nodes[ , "nTips"] <= maxtax, "Node"]
 
-    ## I need to make a way to automate finding the clades of interst, and ind oing so avoid the
-    # situation where it finds two nodes that are nested within each other. The first thing is to
-    # find nodes from the list of candidates that are not nested, and then pick at random from them.
+      ## I need to make a way to automate finding the clades of interst, and ind oing so avoid the
+      # situation where it finds two nodes that are nested within each other. The first thing is to
+      # find nodes from the list of candidates that are not nested, and then pick at random from them.
 
-    change_nodes <- NULL
-    pairs <- list()
+      change_nodes <- NULL
+      pairs <- list()
 
-    # If I just find the nested pairs, then pick one from each, then discard them from the candidates,
-    # I should be alright...
-    for (k in candidates) {
-      descs_focus <- getDescs(tree, k)
-      remainder <- candidates[candidates != k]
+      # If I just find the nested pairs, then pick one from each, then discard them from the candidates,
+      # I should be alright...
+      for (k in candidates) {
+        descs_focus <- getDescs(tree, k)
+        remainder <- candidates[candidates != k]
 
-      # If there are nested nodes, put them together into a different object
-      # in order to later pick a single one of them at random.
-      for (j in remainder) {
-        descs_remainder <- getDescs(tree, j)
-        if (any(descs_focus %in% descs_remainder)) {
-          pairs[[length(pairs) + 1]] <- c(k, j)
+        # If there are nested nodes, put them together into a different object
+        # in order to later pick a single one of them at random.
+        for (j in remainder) {
+          descs_remainder <- getDescs(tree, j)
+          if (any(descs_focus %in% descs_remainder)) {
+            pairs[[length(pairs) + 1]] <- c(k, j)
+          }
         }
+
       }
 
-    }
+      if (length(pairs) > 0) {
 
-    if (length(pairs) > 0) {
+        for (k in 1:length(pairs)) {
+          pairs[[k]] <- sort(pairs[[k]])
+        }
 
-      for (k in 1:length(pairs)) {
-        pairs[[k]] <- sort(pairs[[k]])
+        pairs <- matrix(unlist(unique(pairs)),,2, byrow = TRUE)
+        odds <- unique(as.vector(pairs) [sapply(as.vector(pairs), function(x) sum(pairs == x) >1)])
+        pairs_n_odds <- c(pairs[!c(pairs) %in% odds], odds)
+
+        pairs_selection <- NULL
+        odds_selection <- NULL
+
+        if (length(odds) > 0) {
+          odds_selection <- sample(odds, 1)
+        }
+
+        for (k in 1:nrow(pairs)) {
+          select <- sample(pairs[k, ], 1)
+          if (!select %in% odds)  
+            pairs_selection <- c(pairs_selection, select)
+        }
+
+        candidates <- c(candidates[!candidates %in% pairs_n_odds], odds_selection, pairs_selection)
       }
-
-      pairs <- matrix(unlist(unique(pairs)),,2, byrow = TRUE)
-      odds <- unique(as.vector(pairs) [sapply(as.vector(pairs), function(x) sum(pairs == x) >1)])
-      pairs_n_odds <- c(pairs[!c(pairs) %in% odds], odds)
-
-      pairs_selection <- NULL
-      odds_selection <- NULL
-
-      if (length(odds) > 0) {
-        odds_selection <- sample(odds, 1)
-      }
-
-      for (k in 1:nrow(pairs)) {
-        select <- sample(pairs[k, ], 1)
-        if (!select %in% odds)  
-          pairs_selection <- c(pairs_selection, select)
-      }
-
-      candidates <- c(candidates[!candidates %in% pairs_n_odds], odds_selection, pairs_selection)
-
     }
 
     change_nodes <- sample(candidates, clades)
@@ -148,7 +147,6 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
         dat <- as.data.frame(cbind(t1$states, t2$states))
 
         for (k in 1:length(changetrees)) {
-          print(k)
         
           Q_dep <- matrix(c(0, 0.4, 0.4, 0,
                             2, 0,   0,   2,
