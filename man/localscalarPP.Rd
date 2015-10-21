@@ -15,6 +15,8 @@ localscalarPP(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 \item{burnin}{The burnin (if required) for the mcmc (generally worked out from the other logfile)}
 
 \item{thinning}{Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.}
+
+\item{returnscales}{A vector of descendant nodes describing branches for which to return full distributions of scalars for.}
 }
 \description{
 A function that takes the output of a kappa, lambda, delta, VRates etc. RJ bayesTraits run and runs post-processing on it.
