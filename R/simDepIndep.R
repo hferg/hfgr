@@ -20,6 +20,7 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
     candidates <- 0
     while (length(candidates) < clades) {
       tree <- sim.bd.taxa(treesize, numbsim = 1, lambda = 0.2, mu = 0.01, complete = FALSE)[[1]]
+      tree <- ladderize(tree)
       tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
       nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
       colnames(nodes) <- c("Node", "nTips")
