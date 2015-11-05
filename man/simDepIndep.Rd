@@ -4,7 +4,7 @@
 \alias{simDepIndep}
 \title{simDepIndep}
 \usage{
-simDepIndep(itts, treesize, mintax, maxtax, clades, base_mode)
+simDepIndep(itts, treesize, mintax, maxtax, clades, base_mode, base_rate = 2)
 }
 \arguments{
 \item{itts}{The number of trees and datasets to generate.}
@@ -18,6 +18,8 @@ simDepIndep(itts, treesize, mintax, maxtax, clades, base_mode)
 \item{clades}{The number of clades to simulate the opposite model in.}
 
 \item{base_mode}{The model for the whole tree that the clades vary from. E.g. if "dependent" then the tree will be a dependent model, with n clades evolved as independent. If "independent" than vice versa.}
+
+\item{base_rate}{The model defaults to a "base transition rate" of 2 changes per mean path length, this changes that.}
 }
 \description{
 A function that simulates either dependent or independent evolution between two binary

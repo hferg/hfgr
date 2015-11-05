@@ -13,8 +13,9 @@
 #' @param maxtax The maximum size for the clades that vary from the background model.
 #' @param clades The number of clades to simulate the opposite model in.
 #' @param base_mode The model for the whole tree that the clades vary from. E.g. if "dependent" then the tree will be a dependent model, with n clades evolved as independent. If "independent" than vice versa.
+#' @param base_rate The model defaults to a "base transition rate" of 2 changes per mean path length, this changes that.
 
-simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
+simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode, base_rate = 2) {
   trees <- vector(mode = "list", length = itts)
   for (i in 1:itts) {
     candidates <- 0
@@ -25,6 +26,10 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
       nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
       colnames(nodes) <- c("Node", "nTips")
       nodes[ , 1] <- tree$edge[ , 2]
+
+      meanpl <- mean(nodeHeights(tree)[ , 2])
+      # btrans is the base transition rate
+      btrans <- round(base_rate / meanpl, 1)
 
       for (k in 1:nrow(nodes)) {
         nodes[k, 2] <- sum(getDescs(tree, nodes[k, 1]) < length(tree$tip.label)) 
@@ -85,7 +90,14 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
     }
 
     change_nodes <- sample(candidates, clades)
-    
+    change_taxa <-  vector(mode = "list", length = length(change_nodes))
+    for (k in 1:length(change_taxa)) {
+      tips <- getDescs(tree, change_nodes[[k]])
+      tips <- tips[tips <= length(tree$tip.label)]
+      tips <- tree$tip.label[tips]
+      change_taxa[[k]] <- tips
+    }
+
     # Now split off the subtrees for simulation.
     changetrees <- vector(mode = "list", length = clades)
     for (k in 1:clades) {
@@ -97,10 +109,11 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
 
     # now simulate the data.
     if (base_mode == "dependent") {
-      Q <- matrix(c(0, 0.4, 0.4, 0,
-                2, 0,   0,   2,
-                2, 0,   0,   2,
-                0, 0.4 ,0.4 ,0), 4, 4, byrow=TRUE)
+      Q <- matrix(c(0,          btrans / 2, btrans / 2, 0,
+                    btrans * 2, 0,          0,          btrans * 2,
+                    btrans * 2, 0,          0,          btrans * 2,
+                    0,          btrans / 2, btrans / 2, 0), 
+          4, 4, byrow=TRUE)
       # Name it and set the diagonal
       rownames(Q) <- colnames(Q) <- c("aa", "ab", "ba", "bb")
       diag(Q) <- -rowSums(Q)
@@ -119,7 +132,7 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
 
       # Now find the root state for trait 1 for each of the change_nodes
       for (k in 1:length(changetrees)) {
-        Q_ind <- matrix(c(-1, 1, 1, -1), 2)
+        Q_ind <- matrix(c(-btrans, btrans, btrans, -btrans), 2)
         rownames(Q_ind) <- colnames(Q_ind) <- letters[1:2]
         # TRAIT 1      
         root <- names(t1$maps[[which(t1$edge[ , 2] == change_nodes[k])]])
@@ -141,7 +154,7 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
     
     } else if (base_mode == "independent") {
 
-        Q_ind <- matrix(c(-1, 1, 1, -1), 2)
+        Q_ind <- matrix(c(-btrans, btrans, btrans, -btrans), 2)
         rownames(Q_ind) <- colnames(Q_ind) <- letters[1:2]
         t1 <- sim.history(tree, Q_ind)
         t2 <- sim.history(tree, Q_ind)
@@ -149,10 +162,11 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
 
         for (k in 1:length(changetrees)) {
         
-          Q_dep <- matrix(c(0, 0.4, 0.4, 0,
-                            2, 0,   0,   2,
-                            2, 0,   0,   2,
-                            0, 0.4 ,0.4 ,0), 4, 4, byrow=TRUE)
+          Q_dep <- matrix(c(0,          btrans / 2, btrans / 2, 0,
+                    btrans * 2, 0,          0,          btrans * 2,
+                    btrans * 2, 0,          0,          btrans * 2,
+                    0,          btrans / 2, btrans / 2, 0), 
+          4, 4, byrow=TRUE)
           # Name it and set the diagonal
           rownames(Q_dep) <- colnames(Q_dep) <- c("aa", "ab", "ba", "bb")
           diag(Q_dep) <- -rowSums(Q_dep)
@@ -224,8 +238,8 @@ simDepIndep <- function(itts, treesize, mintax, maxtax, clades, base_mode) {
     dat$V2 <- as.numeric(dat$V2)
     colnames(dat) <- c("trait1", "trait2")
 
-    trees[[i]] <- list(tree = tree, data = dat, changed_nodes = change_nodes)
+    trees[[i]] <- list(tree = tree, data = dat, changed_taxa = change_taxa)
   }
-  
+    
   return(trees)
 }
