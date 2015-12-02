@@ -16,10 +16,7 @@ localDelta <- function(tree, node, delta, rescale = TRUE) {
   # for comparison later on...
 
   subtree <- drop.tip(tree, tree$tip.label[!tree$tip.label %in% tips])
-
-  og.edge <- tree$edge[tree$edge[ , 2] %in% descs, ]
-  og.edge.length <- tree$edge.length[tree$edge[ , 2] %in% descs]
-  
+ 
   # And now apply the delta transformation to that new subtree, which means I don't need to 
   # work out transformed edges etc.
 
@@ -29,6 +26,7 @@ localDelta <- function(tree, node, delta, rescale = TRUE) {
   hts$t <- T - hts$end
   hts$e <- hts$start - hts$end
   hts$a <- hts$t - hts$e
+  hts$a[hts$a < 0] <- 0 
 
   bls <- (hts$a + hts$e) ^ delta - hts$a ^ delta
 
