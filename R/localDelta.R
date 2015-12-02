@@ -4,36 +4,42 @@
 #' @param tree A tree of class phylo.
 #' @param node A node number describing the clade(s) to be transformed.
 #' @param delta The value or values of lambda by which to transform the specified clade(s).
+#' @name localDelta
 
 # TODO(hfg): Add rescale option. Find the original root to tip length of the clade, divide it by the new root to tip length, and then multiply the new branch lengths by that.
 
 localDelta <- function(tree, node, delta, rescale = TRUE) {
   descs <- getDescs(tree, node)
-  descs <- c(descs, node)
-  trans.edges <- which(tree$edge[ ,1] %in% descs & tree$edge[ ,1] > length(tree$tip.label))
-  trans.edges <- c(trans.edges, which(tree$edge[ ,2] == node))
-  old.mean <- mean(tree$edge.length[trans.edges])
-  descs <- c(descs, tree$edge[which(tree$edge[ ,2] == node), 1])
-  bls <- tree$edge.length[trans.edges]
-  times <- branching.times(tree)
-  times <- times[names(times) %in% descs]
-  transnode <- nodeheight(tree, node)
-  originalsum <- sum(tree$edge.length[trans.edges])
-  times <- max(times) - times
-  res <- tree
+  tips <- tree$tip.label[descs[descs <= length(tree$tip.label)]]
+
+  # Make a subtree by using drop.tip, and keep a copy of the edge matrix 
+  # for comparison later on...
+
+  subtree <- drop.tip(tree, tree$tip.label[!tree$tip.label %in% tips])
+
+  og.edge <- tree$edge[tree$edge[ , 2] %in% descs, ]
+  og.edge.length <- tree$edge.length[tree$edge[ , 2] %in% descs]
   
-  for (i in 1:length(trans.edges)) {
-    bl <- tree$edge.length[trans.edges[i]]
-    age <- times[names(times) %in% tree$edge[trans.edges][i]]
-    res$edge.length[trans.edges[i]] <- (age + bl) ^ delta - age ^ delta
-  }
-  
+  # And now apply the delta transformation to that new subtree, which means I don't need to 
+  # work out transformed edges etc.
+
+  n <- Ntip(subtree)
+  hts <- phyloHeights(subtree)
+  T <- hts$start[n + 1]
+  hts$t <- T - hts$end
+  hts$e <- hts$start - hts$end
+  hts$a <- hts$t - hts$e
+
+  bls <- (hts$a + hts$e) ^ delta - hts$a ^ delta
+
+  subtree$edge.length <- bls[subtree$edge[ , 2]]
+
   if (rescale) {
-    newsum <- sum(res$edge.length[trans.edges])
-    ratio <- originalsum / newsum
-    res$edge.length[trans.edges] <- res$edge.length[trans.edges] * ratio
+    scale <- T ^ delta
+    subtree$edge.length <- (subtree$edge.length / scale) * T
   }
-  
+
+  tree$edge.length[tree$edge[ , 2] %in% descs] <- subtree$edge.length
+  res <- tree
   return(res)
 }
-
