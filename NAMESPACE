@@ -3,6 +3,7 @@
 export(RJbranchScalar)
 export(asymmTree)
 export(gLegend)
+export(getCovProbs)
 export(getDescs)
 export(getMLparams)
 export(getTipNames)

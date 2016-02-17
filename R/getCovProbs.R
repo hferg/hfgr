@@ -3,6 +3,7 @@
 #' after fitting the covarion discrete model.
 #' probgraphs will make a pdf of the overlap in probabilities at each node.
 #' @export
+#' @name getCovProbs
 
 getCovProbs <- function(log, tree, ignore50 = FALSE, probgraphs = FALSE) {
   
