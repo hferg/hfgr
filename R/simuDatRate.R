@@ -4,8 +4,8 @@
 #' Based on adding a constant to the tip data branch by branch and weighting by branch length and does
 #' not need to stretch the phylogeny.
 #' @name simuDatRate
-#' @param tree
-#' @param node
+#' @param tree The tree that data is simulated on.
+#' @param node The node at which to make the changes.
 #' @param a The constant that is weighted by branch length and added to the data at the tips. Once the relationship between scalar and this is known, this can be scalar
 #' @param sig The standard deviation of the random component of the BM simulation. NOT sigma squared.
 #' @param dat If you want to use some data you already have and change it this way, put it here.
