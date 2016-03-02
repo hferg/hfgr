@@ -4,7 +4,8 @@
 \alias{niceHist}
 \title{niceHist}
 \usage{
-niceHist(parameter, fill = "dodgerblue", breaks = "scott", title = "")
+niceHist(parameter, fill = "dodgerblue", breaks = "scott", title = "",
+  vline = 0, textsize = 12, face = "bold")
 }
 \arguments{
 \item{parameter}{The a vecotr of values that you want a histogram of.}

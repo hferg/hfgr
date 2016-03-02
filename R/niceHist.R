@@ -12,7 +12,8 @@
 #' @return A histogram with nice ggplot aesthetics, and good bin widths.
 #' @export
 
-niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "") {
+niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "", vline = 0,
+  textsize = 12, face = "bold") {
   dat <- parameter[!is.na(parameter)]
   
   if (breaks == "scott") {
@@ -20,17 +21,21 @@ niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "
   } else if (breaks == "fandd") {
     bwidth <- 2 * IQR(dat) * length(dat) ^ -(1/3)
   } else {
-    bwidth = (max(dat) - min(dat))/30
+    bwidth = breaks
   }
     
   if (fill == "count") {
     ggplot(data.frame(parameter = dat), aes(x = parameter, fill = ..count..)) +
       geom_histogram(color = "darkgray", binwidth = bwidth) +
-      ggtitle(title)
+      ggtitle(title) +
+      theme(axis.text = element_text(size = textsize, face = face)) +
+      geom_vline(xintercept = vline)
   } else {
     ggplot(data.frame(parameter = dat), aes(x = parameter)) +
       geom_histogram(color = "darkgray", fill = fill, binwidth = bwidth) +
-      ggtitle(title)
+      ggtitle(title) +
+      theme(axis.text = element_text(size = textsize, face = face)) +
+      geom_vline(xintercept = vline)
   }
 }
 
