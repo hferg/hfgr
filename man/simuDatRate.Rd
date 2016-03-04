@@ -4,11 +4,13 @@
 \alias{simuDatRate}
 \title{simuDatRate}
 \usage{
-simuDatRate(tree, node, a, sig, dat = NULL, method = "recursive",
-  standardise = FALSE)
+simuDatRate(tree, transtree = NULL, node, a, sig, dat = NULL,
+  method = "recursive", standardise = FALSE)
 }
 \arguments{
 \item{tree}{The tree that data is simulated on.}
+
+\item{transtree}{If you want to simulate data using a transformed tree to derive branch lengths, then this is where that tree goes. Defaults to NULL.}
 
 \item{node}{The node at which to make the changes.}
 

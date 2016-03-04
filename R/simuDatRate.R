@@ -5,6 +5,7 @@
 #' not need to stretch the phylogeny.
 #' @name simuDatRate
 #' @param tree The tree that data is simulated on.
+#' @param transtree If you want to simulate data using a transformed tree to derive branch lengths, then this is where that tree goes. Defaults to NULL.
 #' @param node The node at which to make the changes.
 #' @param a The constant that is weighted by branch length and added to the data at the tips. Once the relationship between scalar and this is known, this can be scalar
 #' @param sig The standard deviation of the random component of the BM simulation. NOT sigma squared.
@@ -13,7 +14,7 @@
 #' @param standardise Logical, whether or not to z-standardise the data. Defaults to FALSE.
 #' @export
 
-simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive", standardise = FALSE) {
+simuDatRate <- function(tree, transtree = NULL, node, a, sig, dat = NULL, method = "recursive", standardise = FALSE) {
   
   if (isDefined(dat)) {
     dat <- dat
@@ -25,19 +26,23 @@ simuDatRate <- function(tree, node, a, sig, dat = NULL, method = "recursive", st
     dat <- scale(dat, center = TRUE, scale = TRUE)
   }
   
-  transdat <- dat  
+  transdat <- dat
 
-  descs <- c(getDescs(tree, node), node)
-  internal <- descs[descs > length(tree$tip.label)]
-  tips <- descs[descs < length(tree$tip.label)]
-  edges <- tree$edge[tree$edge[ ,2] %in% c(internal, tips), ]
-  bls <- tree$edge.length[tree$edge[ ,2] %in% c(internal, tips)]
+  if (is.null(transtree)) {
+    transtree <- tree
+  }
+
+  descs <- c(getDescs(transtree, node), node)
+  internal <- descs[descs > length(transtree$tip.label)]
+  tips <- descs[descs < length(transtree$tip.label)]
+  edges <- transtree$edge[transtree$edge[ ,2] %in% c(internal, tips), ]
+  bls <- transtree$edge.length[transtree$edge[ ,2] %in% c(internal, tips)]
   
   if (method == "recursive") {
     
     for (i in 1:nrow(edges)) {
-      tps <- getDescs(tree, edges[i, 2])
-      tps <- tps[tps < length(tree$tip.label)]
+      tps <- getDescs(transtree, edges[i, 2])
+      tps <- tps[tps < length(transtree$tip.label)]
       num <- sample(2, 1)
       
       if (num == 1) {
