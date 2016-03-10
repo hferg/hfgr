@@ -287,7 +287,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         dens <- density(rates[[i]])
         counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
-        counts[i, "modeRate"] <- NA
+        counts[i, "modeRate"] <- rates[[i]]
       }
   }
 
@@ -304,7 +304,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         dens <- density(deltas[[i]])
         counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
-        counts[i, "modeDelta"] <- NA
+        counts[i, "modeDelta"] <- deltas[[i]]
       }
   }
 
@@ -321,7 +321,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         dens <- density(kappas[[i]])
         counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
-        counts[i, "modeKappa"] <- NA
+        counts[i, "modeKappa"] <- kappas[[i]]
       }
   }
 
@@ -338,7 +338,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         dens <- density(lambdas[[i]])
         counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
       } else {
-        counts[i, "modeLambda"] <- NA
+        counts[i, "modeLambda"] <- lambdas[[i]]
       }
   }
 
