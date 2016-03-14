@@ -273,6 +273,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
 
 
   # First add in 1 where there is a NULL.
+  # Then add in the quartiles, mean and median. The mode goes in if there 
+  # is a greater than one sample. 
+  # TODO HFG: Fix the mode - there is a VERY small chance that if there
+  # are only two samples they can add to a perfect round number, which
+  # means there is no mdoe. This should be SO unlikely at 3 samples as to
+  # not worry.
 
   for (i in 1:length(rates)) {
     if (is.null(rates[[i]])) {
@@ -285,7 +291,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       counts[i, "medianRate"] <- median(rates[[i]])
       if (length(rates[[i]]) > 1) {
         dens <- density(rates[[i]])
-        counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
+        if (length(dens$x[which(dens$y == max(dens$y))]) != 1) {
+          dens_poss <- dens$x[which(dens$y == max(dens$y))]
+          counts[i, "modeRate"] <- sample(dens_poss, 1)
+        } else {
+          counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
+        }
       } else {
         counts[i, "modeRate"] <- rates[[i]]
       }
@@ -302,7 +313,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       counts[i, "medianDelta"] <- median(deltas[[i]])
       if (length(deltas[[i]]) > 1) {
         dens <- density(deltas[[i]])
-        counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
+        if (length(dens$x[which(dens$y == max(dens$y))]) != 1) {
+          dens_poss <- dens$x[which(dens$y == max(dens$y))]
+          counts[i, "modeDelta"] <- sample(dens_poss, 1)
+        } else {
+          counts[i, "modeDelta"] <- dens$x[which(dens$y == max(dens$y))]
+        }
       } else {
         counts[i, "modeDelta"] <- deltas[[i]]
       }
@@ -319,7 +335,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       counts[i, "medianKappa"] <- median(kappas[[i]])
       if (length(kappas[[i]]) > 1) {
         dens <- density(kappas[[i]])
-        counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
+        if (length(dens$x[which(dens$y == max(dens$y))]) != 1) {
+          dens_poss <- dens$x[which(dens$y == max(dens$y))]
+          counts[i, "modeKappa"] <- sample(dens_poss, 1)
+        } else {
+          counts[i, "modeKappa"] <- dens$x[which(dens$y == max(dens$y))]
+        }
       } else {
         counts[i, "modeKappa"] <- kappas[[i]]
       }
@@ -336,7 +357,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       counts[i, "medianLambda"] <- median(lambdas[[i]])
       if (length(lambdas[[i]]) > 1) {  
         dens <- density(lambdas[[i]])
-        counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
+        if (length(dens$x[which(dens$y == max(dens$y))]) != 1) {
+          dens_poss <- dens$x[which(dens$y == max(dens$y))]
+          counts[i, "modeLambda"] <- sample(dens_poss, 1)
+        } else {
+          counts[i, "modeLambda"] <- dens$x[which(dens$y == max(dens$y))]
+        }
       } else {
         counts[i, "modeLambda"] <- lambdas[[i]]
       }
