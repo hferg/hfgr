@@ -9,7 +9,7 @@ meanBranches(reftree, trees, burnin = 0, thinning = 1)
 \arguments{
 \item{reftree}{A tree that provides the reference topology (ideally the tree the analysis was run on)}
 
-\item{trees}{The posterior sample of stretched trees from which you want the mean branch lengths.}
+\item{trees}{The logfile for the rj trees posterior.}
 }
 \description{
 Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.

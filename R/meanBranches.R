@@ -2,13 +2,13 @@
 #'
 #' Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.
 #' @param reftree A tree that provides the reference topology (ideally the tree the analysis was run on)
-#' @param trees The posterior sample of stretched trees from which you want the mean branch lengths.
+#' @param trees The logfile for the rj trees posterior.
 #' @export
 
 meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
 
   reftree <- ladderize(reftree)
-  
+  trees <- read.nexus(trees)
   trees <- trees[seq.int(burnin, length(trees), thinning)]
   
   #bls <- vector(mode = "numeric", length = length(reftree$edge.length))
