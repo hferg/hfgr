@@ -4,7 +4,8 @@
 \alias{plotTree}
 \title{plotTree}
 \usage{
-plotTree(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1)
+plotTree(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
+  main = "")
 }
 \arguments{
 \item{tree}{An object of class phylo}
@@ -16,6 +17,8 @@ plotTree(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1)
 \item{scale}{Logical - show the scale bar, or not?}
 
 \item{cex}{Scaling factor for tip labels and node labels - universal.}
+
+\item{main}{A string that will be the title on the plot (if desired)}
 }
 \description{
 A silly little function that makes plotting a tree without tip labels and with
