@@ -4,14 +4,14 @@
 \alias{plotTree}
 \title{plotTree}
 \usage{
-plotTree(tree, tips = FALSE, nodes = FALSE, scale = TRUE, cex = 1)
+plotTree(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1)
 }
 \arguments{
 \item{tree}{An object of class phylo}
 
 \item{tips}{Logical - show tip labels or not?}
 
-\item{nodes}{Logical - show nodel labels, or nor?}
+\item{nodes}{TRUE shows all node labels, FALSE supresses node labels (default), or a vecotr of which nodes to highlight.}
 
 \item{scale}{Logical - show the scale bar, or not?}
 
