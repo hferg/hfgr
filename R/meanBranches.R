@@ -43,7 +43,11 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
     rangebl[i] <- max(bls[i, ]) - min(bls[i, ])
   }
 
+  meantree <- reftree
+  meantree$edge.length <- branchesmean
+
   res <- list(ogtree = reftree, 
+              meantree = meantree,
               meanbranches = branchesmean, 
               medianbranches = branchesmedian, 
               quart25 = quart25, 
