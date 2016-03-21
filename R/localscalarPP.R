@@ -75,7 +75,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   counts[ , "descNode"] <- c((length(tree$tip.label) + 1), extree$edge[ , 2])
   counts[ , "orgBL"] <- c(0, extree$edge.length)
   print("Calculating mean branch lengths.")
-  meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, thinning = thinning)
+  meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, thinning = thinning)
   counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
   counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
   counts[ , "quart25"] <- c(0, meanbl$quart25)
