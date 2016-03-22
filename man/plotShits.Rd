@@ -5,8 +5,8 @@
 \alias{plotShits}
 \title{plotShifts}
 \usage{
-plotShifts(PP, tree, scalar, niter, scaled = FALSE, colour = "black",
-  cex = 1, tips = FALSE)
+plotShifts(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1,
+  tips = FALSE)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -14,8 +14,6 @@ plotShifts(PP, tree, scalar, niter, scaled = FALSE, colour = "black",
 \item{tree}{The original phylogeny used for the analysis.}
 
 \item{scalar}{The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch}
-
-\item{niter}{The number of samples in the posterior (i.e. the number of trees in the sample)}
 
 \item{scaled}{Logical - plot the original tree, or the mean/sclaed tree?}
 

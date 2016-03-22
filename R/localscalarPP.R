@@ -386,9 +386,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   }
   counts <- counts[ , keeps]
   if (returnscales == TRUE) {
-    res <- list(data = counts, rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
+    res <- list(data = counts, niter = length(ratesperit), rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
   } else {
-    res <- counts
+    res <- list(data = counts, niter = length(ratesperit))
   }
   return(res)
 }
