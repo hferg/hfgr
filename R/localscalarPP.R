@@ -385,10 +385,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     }
   }
   counts <- counts[ , keeps]
+  meantree <- extree
+  meantree$edge.length <- counts[ , "meanBL"]
   if (returnscales == TRUE) {
-    res <- list(data = counts, niter = length(ratesperit), rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
+    res <- list(data = counts, niter = length(ratesperit), rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas, meantree = meantree)
   } else {
-    res <- list(data = counts, niter = length(ratesperit))
+    res <- list(data = counts, niter = length(ratesperit), meantree = meantree)
   }
   return(res)
 }

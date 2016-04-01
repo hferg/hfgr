@@ -4,6 +4,7 @@
 #' @param attack Attackers attack value
 #' @param defense Defenders resist value
 #' @param TN Target number (for simple duel - ignores any defense stuff)
+#' @param suit Is a specific suit needed?
 #' @param aplus Number of positive twists for attacker
 #' @param aminus Number of negative twists for attacker
 #' @param dplus Number of positive twists for defender
@@ -12,7 +13,7 @@
 #' @name simulateFlips
 #' @export
 
-simulateFlips <- function(attack, defense, TN = NULL, aplus = 0, aminus = 0, dplus = 0, dminus = 0, dtrack = NULL) {
+simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, aminus = 0, dplus = 0, dminus = 0, dtrack = NULL) {
   # TO_THINK
   #   Should this include some attempt to make the deck smaller based on what has come out of it?
   # Build the deck, include both jokers.
@@ -87,8 +88,15 @@ simulateFlips <- function(attack, defense, TN = NULL, aplus = 0, aminus = 0, dpl
   x2w <- max(which(dpb$data[[1]]$x > 0))
   x1m <- max(which(dpb$data[[1]]$x <= 1))
   x2m <- max(which(dpb$data[[1]]$x > 1))
-  x1h <- max(which(dpb$data[[1]]$x <= 6))
-  x2h <- max(which(dpb$data[[1]]$x > 6))
+  
+  if (any(dpb$data[[1]]$x > 6)) {
+    x1h <- max(which(dpb$data[[1]]$x <= 6))
+    x2h <- max(which(dpb$data[[1]]$x > 6))
+  } else {
+    x1h <- x2m
+    x2h <- x2m
+  }
+
   if (any(dpb$data[[1]]$x > 11)) {  
     x1e <- max(which(dpb$data[[1]]$x <= 11))
     x2e <- max(which(dpb$data[[1]]$x > 11))  
