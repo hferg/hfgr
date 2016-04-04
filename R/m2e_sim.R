@@ -122,7 +122,3 @@ simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, a
 
   return(ret)
 }
-
-
-
-22 - 31
