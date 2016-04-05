@@ -4,7 +4,7 @@
 \alias{treeTrans}
 \title{treeTrans}
 \usage{
-treeTrans(tree, param, nodes = NULL, tips = NULL, value, rescale = TRUE)
+treeTrans(tree, param, nodes = NULL, tips = NULL, value, rescale = FALSE)
 }
 \arguments{
 \item{tree}{A tree of class phylo}

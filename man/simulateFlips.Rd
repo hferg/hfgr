@@ -4,8 +4,8 @@
 \alias{simulateFlips}
 \title{simuleteFlips}
 \usage{
-simulateFlips(attack, defense, TN = NULL, aplus = 0, aminus = 0,
-  dplus = 0, dminus = 0, dtrack = NULL)
+simulateFlips(attack, defense, TN = NULL, suit = FALSE, aplus = 0,
+  aminus = 0, dplus = 0, dminus = 0, dtrack = NULL)
 }
 \arguments{
 \item{attack}{Attackers attack value}
@@ -13,6 +13,8 @@ simulateFlips(attack, defense, TN = NULL, aplus = 0, aminus = 0,
 \item{defense}{Defenders resist value}
 
 \item{TN}{Target number (for simple duel - ignores any defense stuff)}
+
+\item{suit}{Is a specific suit needed?}
 
 \item{aplus}{Number of positive twists for attacker}
 
