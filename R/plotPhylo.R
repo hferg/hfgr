@@ -8,10 +8,10 @@
 #' @param scale Logical - show the scale bar, or not?
 #' @param cex Scaling factor for tip labels and node labels - universal.
 #' @param main A string that will be the title on the plot (if desired)
-#' @name plotTree
+#' @name plotPhylo
 #' @export
 
-plotTree <- function(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1, main = "") {
+plotPhylo <- function(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1, main = "") {
   plot(tree, show.tip.label = tips, cex = cex, main = main)
   if (!is.null(nodes)) {
     if (is.numeric(nodes)) {
