@@ -2,10 +2,13 @@
 
 export(RJbranchScalar)
 export(asymmTree)
+export(branchChangeSim)
+export(cladeChangeSim)
 export(gLegend)
 export(getCovProbs)
 export(getDescs)
 export(getMLparams)
+export(getPL)
 export(getTipNames)
 export(ggplotShareLeg)
 export(isDefined)
