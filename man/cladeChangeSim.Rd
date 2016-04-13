@@ -5,8 +5,9 @@
 \title{cladeChangeSim
 Simulates the expected change along all branches of a defined clade.}
 \usage{
-cladeChangeSim(tree, node, directional = "non", startval = 0, sigsq,
-  plot = FALSE)
+cladeChangeSim(tree, reftree = NULL, node, mode = "BM",
+  directional = "non", startval = 0, sigsq, plot = FALSE,
+  increment = NULL, param.value = NULL)
 }
 \description{
 cladeChangeSim
