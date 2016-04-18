@@ -118,7 +118,8 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   # delta, or whatever. It will be slow to reasign, but I don't know how long it needs to be - potentially
   # very long... Especially big trees, long runs etc.
 
-  rates <- vector(mode = "list", length = nrow(counts))
+  rates <- matrix(nrow = nrow(counts), ncol = length(ratesperit))
+    rownames(rates) <- counts[ , "branch"]
   deltas <- vector(mode = "list", length = nrow(counts))
   kappas <- vector(mode = "list", length = nrow(counts))
   lambdas <- vector(mode = "list", length = nrow(counts))
@@ -136,7 +137,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       comptable[ , c(2:6)] <- 0
       colnames(comptable) <- c("descNode", "totalscalar", "rate", "delta", "kappa", "lambda")
       
-      iteration_rates <- vector(mode = "list", length = nrow(counts))
+      iteration_rates <- rep(1, nrow(counts))
 
       for (j in 1:nrow(scalars)) {
         # Get the node the scalar applies to, and the type of scalar.
@@ -171,11 +172,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the rates.
           for (k in which(rws)) {
-            if (is.null(iteration_rates[[k]])) {
-              iteration_rates[[k]] <- currentscale
-            } else {
-              iteration_rates[[k]] <- iteration_rates[[k]] * currentscale
-            }
+              iteration_rates[k] <- iteration_rates[[k]] * currentscale
           }
         }
         if (currenttrans == "Branch") {
@@ -190,11 +187,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the deltas.
           for (k in which(rws)) {
-            if (is.null(iteration_rates[[k]])) {
-              iteration_rates[[k]] <- currentscale
-            } else {
-              iteration_rates[[k]] <- iteration_rates[[k]] * currentscale
-            }
+              iteration_rates[k] <- iteration_rates[[k]] * currentscale
           }
         }
         if (currenttrans == "Delta") {
@@ -232,7 +225,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
             kappas[[k]] <- c(kappas[[k]], currentscale)
           }
         }    
-        if (currenttrans == "Lambda") {
+        if (currenttrans == "Lambda") {comptable
           descs <- c(getDescs(extree, mrca), mrca)
           rws <- comptable[ , 1] %in% descs
           counts[counts[, "descNode"] %in% descs , "nScalar"] <- counts[counts[, "descNode"] %in% descs , "nScalar"] + 1
@@ -248,13 +241,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         } 
       }
   
-      for (d in 1:length(rates)) {
-        if (is.null(iteration_rates[[d]])) {
-          rates[[d]] <- c(rates[[d]], 1)
-        } else {
-          rates[[d]] <- c(rates[[d]], iteration_rates[[d]])
-        }
-      }
+      rates[ , i] <- iteration_rates
 
       # Now put the yes/no data from comptable into counts in the times scaled/rate, delta etc. This counts the number of 
       # ITERATIONS when scaling occurred  .
@@ -304,25 +291,18 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   # means there is no mdoe. This should be SO unlikely at 3 samples as to
   # not worry.
 
-  for (i in 1:length(rates)) {
-    if (is.null(rates[[i]])) {
-      rates[[i]] <- 1
-    }     
-      counts[i, "rangeRate"] <- max(rates[[i]]) - min(rates[[i]])
-      counts[i, "lqRate"] <- quantile(rates[[i]])[2]
-      counts[i, "uqRate"] <- quantile(rates[[i]])[4]
-      counts[i, "meanRate"] <- mean(rates[[i]])
-      counts[i, "medianRate"] <- median(rates[[i]])
-      if (length(rates[[i]]) > 1) {
-        dens <- density(rates[[i]])
-        if (length(dens$x[which(dens$y == max(dens$y))]) != 1) {
-          dens_poss <- dens$x[which(dens$y == max(dens$y))]
-          counts[i, "modeRate"] <- sample(dens_poss, 1)
-        } else {
-          counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
-        }
+  # This now works through a table, not a list...
+  for (i in 1:nrow(rates)) {
+      counts[i, "rangeRate"] <- max(rates[i, ]) - min(rates[i, ])
+      counts[i, "lqRate"] <- quantile(rates[i, ])[2]
+      counts[i, "uqRate"] <- quantile(rates[i, ])[4]
+      counts[i, "meanRate"] <- mean(rates[i, ])
+      counts[i, "medianRate"] <- median(rates[i, ])
+      if (length(unique(rates[i, ])) == 1){
+        counts[i, "modeRate"] <- unique(rates[i, ])
       } else {
-        counts[i, "modeRate"] <- rates[[i]]
+        dens <- density(rates[i, ])
+        counts[i, "modeRate"] <- dens$x[which(dens$y == max(dens$y))]
       }
   }
 
