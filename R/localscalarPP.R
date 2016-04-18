@@ -91,6 +91,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   descs <- getDescs(extree, node = counts[1, "descNode"])
   counts[1, "nTips"] <- sum(descs <= length(tree$tip.label))
   counts[1, "mid"] <- 0
+  counts[1, "species"] <- paste0(extree$tip.label[order(extree$tip.label)], collapse = ",")
 
   for (i in 2:nrow(counts)) {
     descs <- getDescs(extree, node = counts[i, "descNode"])
@@ -100,6 +101,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     }
     if (counts[i, "descNode"] <= length(extree$tip.label)) {
       counts[i, "species"] <- extree$tip.label[counts[i, "descNode"]]
+    } else {
+      tips <- getDescs(extree, counts[i, "descNode"])
+      tips <- tips[tips <= length(extree$tip.label)]
+      tips <- extree$tip.label[tips]
+      counts[i, "species"] <- paste0(sort(tips), collapse = ",")
     }
     counts[i, "mid"] <- mean(c(hts[(i - 1), 1], hts[(i - 1), 2]))
   }
@@ -130,6 +136,8 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       comptable[ , c(2:6)] <- 0
       colnames(comptable) <- c("descNode", "totalscalar", "rate", "delta", "kappa", "lambda")
       
+      iteration_rates <- vector(mode = "list", length = nrow(counts))
+
       for (j in 1:nrow(scalars)) {
         # Get the node the scalar applies to, and the type of scalar.
         currentnode <- scalars[j, "node"]      
@@ -163,7 +171,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the rates.
           for (k in which(rws)) {
-            rates[[k]] <- c(rates[[k]], currentscale)
+            if (is.null(iteration_rates[[k]])) {
+              iteration_rates[[k]] <- currentscale
+            } else {
+              iteration_rates[[k]] <- iteration_rates[[k]] * currentscale
+            }
           }
         }
         if (currenttrans == "Branch") {
@@ -178,7 +190,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the deltas.
           for (k in which(rws)) {
-            rates[[k]] <- c(rates[[k]], currentscale)
+            if (is.null(iteration_rates[[k]])) {
+              iteration_rates[[k]] <- currentscale
+            } else {
+              iteration_rates[[k]] <- iteration_rates[[k]] * currentscale
+            }
           }
         }
         if (currenttrans == "Delta") {
@@ -228,9 +244,17 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           # Finally record the lambdas.
           for (k in which(rws)) {
             lambdas[[k]] <- c(lambdas[[k]], currentscale)
-          }          
+          }
         } 
-      }      
+      }
+  
+      for (d in 1:length(rates)) {
+        if (is.null(iteration_rates[[d]])) {
+          rates[[d]] <- c(rates[[d]], 1)
+        } else {
+          rates[[d]] <- c(rates[[d]], iteration_rates[[d]])
+        }
+      }
 
       # Now put the yes/no data from comptable into counts in the times scaled/rate, delta etc. This counts the number of 
       # ITERATIONS when scaling occurred  .
