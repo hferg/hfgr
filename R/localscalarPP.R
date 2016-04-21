@@ -47,15 +47,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     ratesperit[[i]] <- scalars
   }
 
-  # ADJUST HERE IN ORDER TO ADD MEAN AND MEDIAN BLS INSTEAD OF NEW BLS.
-  # Get per-branch statistics.
-  # Make a table called counts - this has one row per branch, the ancestor and descendant node, and then
-  # space for the number of scalars in total, the type of scalars, and the number of generations one or more scalar
-  # is applied, as well as space for those scalar types.
-
-  # TODO: I need to add in something to accommodate the root here. It will be the partition in Andrews thing with all
-  #   taxa.
-
   counts <- matrix(ncol = 68, nrow = (nrow(extree$edge) + 1))
 
   colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", "meanBL", "medianBL", "quart25", "quart75", 
@@ -112,12 +103,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   
   counts[ , c(13:67)] <- 0
 
-  # Make tables to store the individual deltas and whatever for each iteration.
-  # How to do this? I can't just have onc cell per branch per iteration - that's no good.
-  # These ought to be lists I think, with one element per branch. Then add to each list each 
-  # delta, or whatever. It will be slow to reasign, but I don't know how long it needs to be - potentially
-  # very long... Especially big trees, long runs etc.
-
   rates <- matrix(nrow = nrow(counts), ncol = length(ratesperit))
     rownames(rates) <- counts[ , "branch"]
   deltas <- vector(mode = "list", length = nrow(counts))
@@ -153,7 +138,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
         # Find the MRCA of those taxa - now the node number (mrca) is in terms of a phylogeny as stored in ape.
         # If the taxa is a single tip, make that MRCA (this can only apply to branch scalars.)
         if (length(taxa) == 1) {
-          mrca <- taxa
+          mrca <- which(tree$tip.label == rjout$taxa[rjout$taxa[ , 1] %in% taxa, 2])
         } else {
           mrca <- getMRCA(extree, rjout$taxa[rjout$taxa[ , 1] %in% taxa, 2])
         }
@@ -282,14 +267,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   counts[ , "mnKpE"] <- counts[ , "nKappa"] / counts[ , "itersKappa"]
   counts[ , "mnLpE"] <- counts[ , "nLambda"] / counts[ , "itersLambda"]
 
-
-  # First add in 1 where there is a NULL.
-  # Then add in the quartiles, mean and median. The mode goes in if there 
-  # is a greater than one sample. 
-  # TODO HFG: Fix the mode - there is a VERY small chance that if there
-  # are only two samples they can add to a perfect round number, which
-  # means there is no mdoe. This should be SO unlikely at 3 samples as to
-  # not worry.
 
   # This now works through a table, not a list...
   for (i in 1:nrow(rates)) {
