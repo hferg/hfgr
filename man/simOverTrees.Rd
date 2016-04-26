@@ -2,12 +2,10 @@
 % Please edit documentation in R/simOverTrees.R
 \name{simOverTrees}
 \alias{simOverTrees}
-\alias{simulateOverTrees}
 \title{simOverTrees
 This function will simulate the expected change over a vector of named trees. It calls cladeChangeSim a bunch of times.}
 \usage{
-simulateOverTrees(tree, reftrees, nsim, node, sigsq, direction,
-  increment = NULL)
+simOverTrees(tree, reftrees, nsim, node, sigsq, direction, increment = NULL)
 }
 \arguments{
 \item{tree}{The original tree.}

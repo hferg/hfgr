@@ -11,7 +11,7 @@
 #' @name simOverTrees
 #' @export
 
-simulateOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL) {
+simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL) {
   nsim <- nsim
   res <- vector(mode = "list", length = nsim)
   if (!is.null(names(reftrees))) {
