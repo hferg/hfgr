@@ -12,7 +12,7 @@
 #' @return A histogram with nice ggplot aesthetics, and good bin widths.
 #' @export
 
-niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "", vline = 0,
+niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "", vline = "mean",
   textsize = 12, face = "bold") {
   dat <- parameter[!is.na(parameter)]
   
@@ -23,7 +23,17 @@ niceHist <- function(parameter, fill = "dodgerblue", breaks = "scott", title = "
   } else {
     bwidth = breaks
   }
-    
+  
+  if (vline == "mean") {
+    vline <- mean(dat)
+  } else if (vline == "median") {
+    vline <- median(dat)
+  } else if (vline == "mode") {
+    vline <- density(dat)$x[which(density(dat)$y == max(density(dat)$y))]
+  } else if (vline == NULL) {
+    vline <- NULL
+  }
+
   if (fill == "count") {
     ggplot(data.frame(parameter = dat), aes(x = parameter, fill = ..count..)) +
       geom_histogram(color = "darkgray", binwidth = bwidth) +
