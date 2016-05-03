@@ -28,21 +28,20 @@ readSimInfo <- function(filename, tree) {
 
     for (j in 1:length(dat)) {
       taxa <- strsplit(dat[[j]][9], ",")[[1]] 
+
+      if (length(taxa) == 1) {
+        mrca <- which(tree$tip.label == taxa)
+      } else {
+        mrca <- getMRCA(tree, taxa)
+      }
+      
       .res[j, c(1:8)] <- dat[[j]][c(1:8)]
       .res[j, c(9, 10)] <- tree$edge[which(tree$edge[ , 2] == mrca), ]
       .res[j, 11] <- dat[[j]][9]      
     }
 
-    if (length(taxa) == 1) {
-      mrca <- which(tree$tip.label == taxa)
-    } else {
-      mrca <- getMRCA(tree, taxa)
-    }
-
-
-
-    colnames(.res) <- hds
-    res[[i]] <- .res
+  colnames(.res) <- hds
+  res[[i]] <- .res
   }
   names(res) <- nms
   return(res)
