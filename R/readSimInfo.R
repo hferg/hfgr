@@ -22,7 +22,7 @@ readSimInfo <- function(filename, tree) {
     }
 
     nms[i] <- paste0(strsplit(gsub("=", "", cur[1]), "\t")[[1]], collapse = "")
-    hds <- c(strsplit(cur[2], "\t")[[1]][c(1:8)], "ancNode", "descNode", "taxa")
+    hds <- c(strsplit(cur[2], "\t")[[1]][c(1:8)], "descNode", "ancNode", "taxa")
     dat <- strsplit(cur[c(3:length(cur))], "\t")
     .res <- matrix(ncol = length(dat[[1]]) + 2, nrow = length(dat))  
 
