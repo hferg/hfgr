@@ -6,6 +6,7 @@
 #' @export
 
 readSimInfo <- function(filename, tree) {
+  tree <- ladderize(tree)
   raw <- readLines(filename)
   nsims <- length(grep("==", raw))
   simpos <- grep("==", raw)
@@ -21,13 +22,24 @@ readSimInfo <- function(filename, tree) {
     }
 
     nms[i] <- paste0(strsplit(gsub("=", "", cur[1]), "\t")[[1]], collapse = "")
-    hds <- strsplit(cur[2], "\t")[[1]]
+    hds <- c(strsplit(cur[2], "\t")[[1]][c(1:8)], "ancNode", "descNode", "taxa")
     dat <- strsplit(cur[c(3:length(cur))], "\t")
-    .res <- matrix(ncol = length(dat[[1]]), nrow = length(dat))  
+    .res <- matrix(ncol = length(dat[[1]]) + 2, nrow = length(dat))  
 
     for (j in 1:length(dat)) {
-      .res[j, ] <- dat[[j]]
+      taxa <- strsplit(dat[[j]][9], ",")[[1]] 
+      .res[j, c(1:8)] <- dat[[j]][c(1:8)]
+      .res[j, c(9, 10)] <- tree$edge[which(tree$edge[ , 2] == mrca), ]
+      .res[j, 11] <- dat[[j]][9]      
     }
+
+    if (length(taxa) == 1) {
+      mrca <- which(tree$tip.label == taxa)
+    } else {
+      mrca <- getMRCA(tree, taxa)
+    }
+
+
 
     colnames(.res) <- hds
     res[[i]] <- .res
