@@ -6,7 +6,7 @@
 \title{plotShifts}
 \usage{
 plotShifts(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1,
-  tips = FALSE)
+  tips = FALSE, threshold = 0)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -22,6 +22,8 @@ plotShifts(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1,
 \item{cex}{The scaling factor for the size of the node circles}
 
 \item{tips}{Show tip labels?}
+
+\item{threshold}{Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)}
 }
 \description{
 Plots the locations of the origins of scalars from the postprocessor output of bayestraits.

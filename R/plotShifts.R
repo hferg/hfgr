@@ -9,15 +9,17 @@
 #' @param colour The colour to use for the node circles
 #' @param cex The scaling factor for the size of the node circles
 #' @param tips Show tip labels?
+#' @param threshold Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)
 #' @name plotShits
 #' @export
 
-plotShifts <- function(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE) {
+plotShifts <- function(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE, 
+  threshold = 0) {
 
   tree <- ladderize(tree)
 
   if (scaled) {
-    tree$edge.length <- PP$data$meanBL
+    tree$edge.length <- PP$data$meanBL[c(2:nrow(PP))]
   }
 
   if (scalar == "delta") {
@@ -28,14 +30,21 @@ plotShifts <- function(PP, tree, scalar, scaled = FALSE, colour = "black", cex =
     cl <- "nOrgnLambda"
   }
 
-  nodes <- PP$data$descNode[which(PP$data[ , cl] != 0)]
+  if (threshold != 0) {
+    nodes <- PP$data$descNode[which((PP$data[ , cl] / PP$niter) >= threshold)]
+    alphas <- PP$data[which((PP$data[ , cl] / PP$niter) >= threshold) , cl] / PP$niter
+  } else {
+    nodes <- PP$data$descNode[which(PP$data[ , cl] != threshold)]
+    alphas <- (PP$data[which(PP$data[ , cl] != 0), cl] / PP$niter)
+  }
+
   col <- vector(mode = "character", length = length(nodes))
-  alphas <- (PP$data[which(PP$data[ , cl] != 0), "nOrgnDelta"] / PP$niter)
+  
 
   for (j in 1:length(alphas)) {
     col[j] <- makeTransparent(colour, alpha = alphas[j])
   }
 
-  plotTree(tree, tips = tips)
+  plotPhylo(tree, tips = tips)
   nodelabels(node = nodes, col = col, pch = 16, cex = cex)
 }

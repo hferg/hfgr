@@ -7,7 +7,7 @@ Simulates the expected change along all branches of a defined clade.}
 \usage{
 cladeChangeSim(tree, reftree = NULL, node, mode = "BM",
   directional = "non", startval = 0, sigsq, plot = FALSE,
-  increment = NULL, param.value = NULL)
+  increment = NULL, param.value = NULL, segments = FALSE)
 }
 \description{
 cladeChangeSim
