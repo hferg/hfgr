@@ -3,7 +3,6 @@
 #' Plots the locations of the origins of scalars from the postprocessor output of bayestraits.
 #' CURRENTLY WORKS ONLY FOR DELTAS.
 #' @param PP The psotprocessor (localscalrPP) output.
-#' @param tree The original phylogeny used for the analysis.
 #' @param scalar The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch
 #' @param scaled Logical - plot the original tree, or the mean/sclaed tree?
 #' @param colour The colour to use for the node circles
@@ -13,13 +12,13 @@
 #' @name plotShits
 #' @export
 
-plotShifts <- function(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE, 
+plotShifts <- function(PP, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE, 
   threshold = 0) {
 
-  tree <- ladderize(tree)
+  tree <- PP$meantree
 
-  if (scaled) {
-    tree$edge.length <- PP$data$meanBL[c(2:nrow(PP))]
+  if (scaled == FALSE) {
+    tree$edge.length <- PP$data$orgBL[2:nrow(PP$data)]
   }
 
   if (scalar == "delta") {

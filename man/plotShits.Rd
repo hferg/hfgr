@@ -5,13 +5,11 @@
 \alias{plotShits}
 \title{plotShifts}
 \usage{
-plotShifts(PP, tree, scalar, scaled = FALSE, colour = "black", cex = 1,
+plotShifts(PP, scalar, scaled = FALSE, colour = "black", cex = 1,
   tips = FALSE, threshold = 0)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
-
-\item{tree}{The original phylogeny used for the analysis.}
 
 \item{scalar}{The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch}
 
