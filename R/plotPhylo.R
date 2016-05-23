@@ -1,4 +1,4 @@
-#' plotTree
+#' plotPhylo
 #'
 #' A silly little function that makes plotting a tree without tip labels and with
 #' an axis easier and quicker.

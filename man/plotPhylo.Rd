@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotPhylo.R
 \name{plotPhylo}
 \alias{plotPhylo}
-\title{plotTree}
+\title{plotPhylo}
 \usage{
 plotPhylo(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
   main = "")
