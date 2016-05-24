@@ -7,6 +7,6 @@
 
 getTipNames <- function(tree, node) {
   descs <- getDescs(tree, node)
-  descs <- [descs <= length(tree$tip.label)]
+  descs <- descs[descs <= length(tree$tip.label)]
   tree$tip.label[descs]
 }
