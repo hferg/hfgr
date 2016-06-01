@@ -14,8 +14,12 @@
 #' transTree(tree, param = "rate", nodes = c(52, 91), value = 3)
 #' transTree(tree, param = "delta", tips = list(c("dog", "cat", "moose"), c("frog", "salamander", "newt")), value = c(0.3, 2))
 
-treeTrans <- function(tree, param, nodes = NULL, tips = NULL, value, rescale = FALSE) {
+treeTrans <- function(tree, param, nodes = "root", tips = NULL, value, rescale = FALSE) {
   
+  if (nodes == "root") {
+    nodes <- length(tree$tip.label) + 1
+  }
+
   if (is.null(nodes) & is.null(tips)) {
     stop("Must specify either node(s) or tips")
   }
