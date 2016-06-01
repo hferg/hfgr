@@ -5,9 +5,18 @@
 \title{cladeChangeSim
 Simulates the expected change along all branches of a defined clade.}
 \usage{
-cladeChangeSim(tree, reftree = NULL, node, mode = "BM",
+cladeChangeSim(tree, reftree = NULL, node = "root", mode = "BM",
   directional = "non", startval = 0, sigsq, plot = FALSE,
-  increment = NULL, param.value = NULL, segments = FALSE)
+  increment = NULL, segments = FALSE)
+}
+\arguments{
+\item{tree}{The time tree over which to simulate change.}
+
+\item{reftree}{A reference tree that may have divergent branch lengths compared the the time tree (for example, a rate scaled tree)}
+
+\item{node}{The node from which the simulation starts (defaults to root)}
+
+\item{plot}{Plot the sim to screen after running?}
 }
 \description{
 cladeChangeSim

@@ -1,14 +1,23 @@
 #'
 #' cladeChangeSim
 #' Simulates the expected change along all branches of a defined clade.
+#' @param tree The time tree over which to simulate change.
+#' @param reftree A reference tree that may have divergent branch lengths compared the the time tree (for example, a rate scaled tree)
+#' @param node The node from which the simulation starts (defaults to root)
+#' @param plot Plot the sim to screen after running?
 #' @name cladeChangeSim
 #' @export
 
-cladeChangeSim <- function(tree, reftree = NULL, node, mode = "BM", directional = "non", startval = 0, sigsq, 
-  plot = FALSE, increment = NULL, param.value = NULL, segments = FALSE) {
+cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", directional = "non", 
+    startval = 0, sigsq, plot = FALSE, increment = NULL, segments = FALSE) {
     # Identify all edges - getDesTips_edge returns tip LABELS descendent from the branch (edge)
     # As such, this gives you all of the branches in the clade.
     # HFG CHANGE HERE
+    
+    if (node == "root") {
+      node <- length(tree$tip.label) + 1
+    }
+
     descs <- getDescs(tree, node)
     tips <- descs[which(descs <= length(tree$tip.label))]
     internal <- descs[which(descs > length(tree$tip.label))]
