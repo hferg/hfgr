@@ -14,92 +14,68 @@ cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", dir
     # As such, this gives you all of the branches in the clade.
     # HFG CHANGE HERE
     
-    if (node == "root") {
-      node <- length(tree$tip.label) + 1
-    }
+  if (node == "root") {
+    node <- length(tree$tip.label) + 1
+  }
 
-    descs <- getDescs(tree, node)
-    tips <- descs[which(descs <= length(tree$tip.label))]
-    internal <- descs[which(descs > length(tree$tip.label))]
-   
+  descs <- getDescs(tree, node)
+  tips <- descs[which(descs <= length(tree$tip.label))]
+  internal <- descs[which(descs > length(tree$tip.label))]
  
-    allbranches <- c(which((tree$edge[ , 2] == node)), which.edge(tree, tree$tip.label[tips]))
-    
-    res <- vector(mode = "list", length = length(allbranches))
-    names(res) <- allbranches
 
-    if (is.null(increment)) {
-      increment <- max(tree$edge.length[allbranches]) / 500
-    }
+  allbranches <- c(which((tree$edge[ , 2] == node)), which.edge(tree, tree$tip.label[tips]))
+  
+  res <- vector(mode = "list", length = length(allbranches))
+  names(res) <- allbranches
 
+  if (is.null(increment)) {
+    increment <- max(tree$edge.length[allbranches]) / 500
+  }
+
+  for (i in allbranches) {
     if (is.null(reftree)) {
-      for (i in allbranches) {
-        bl <- tree$edge.length[i]
-        leading <- which(tree$edge[ , 2] == tree$edge[i, 1])
-
-        if (length(leading) == 0) {
-          strt <- startval
-        } else if (!leading %in% allbranches) {
-          strt <- startval
-        } else {
-          tmp <- res[[which(names(res) == leading)]]
-          strt <- tmp[nrow(tmp), 2]
-        }
-        
-        sim <- branchChangeSim(branchtime = bl, direction = directional, startval = strt, var = sigsq, increment = increment)      
-        if (segments) {
-          sim[ , 1] <- sim[ , 1]+ getPL(tree, node = tree$edge[i, 1])
-          .tmp <- matrix(ncol = 5, nrow = (nrow(sim) - 1))
-          colnames(.tmp) <- c("start", "end", "ancstate", "trait", "branch")
-          .tmp[ , "start"] <- sim[c(1:nrow(sim)) - 1, 1]
-          .tmp[ , "end"] <- sim[c(2:nrow(sim)) , 1] 
-          .tmp[ , "ancstate"] <- sim[c(1:nrow(sim)) - 1, 2]
-          .tmp[ , "trait"] <- sim[c(2:nrow(sim)), 2]
-          .tmp[ , "branch"] <- i
-          sim <- .tmp
-          res[[which(names(res) == i)]] <- sim
-        } else {
-          colnames(sim) <- c("time", "trait")
-          res[[which(names(res) == i)]] <- sim
-          res[[which(names(res) == i)]][ , 1] <- res[[which(names(res) == i)]][ , 1] + getPL(tree, node = tree$edge[i, 1])          
-        }
-      }
+      bl <- tree$edge.length[i]
+      leading <- which(tree$edge[ , 2] == tree$edge[i, 1])
     } else {
-      for (i in allbranches) {
-        bl <- tree$edge.length[i]
-        refbl <- reftree$edge.length[i]
-        blrat <- refbl / bl
-        leading <- which(tree$edge[ , 2] == tree$edge[i, 1])
-
-        if (length(leading) == 0) {
-          strt <- startval
-        } else if (!leading %in% allbranches) {
-          strt <- startval
-        } else {
-          tmp <- res[[which(names(res) == leading)]]
-          strt <- tmp[nrow(tmp), "trait"]
-        }
-        
-        sim <- branchChangeSim(branchtime = bl, direction = directional, startval = strt, var = (sigsq * blrat), 
-            increment = increment)
-        if (segments) {
-          sim[ , 1] <- sim[ , 1]+ getPL(tree, node = tree$edge[i, 1])
-          .tmp <- matrix(ncol = 5, nrow = (nrow(sim) - 1))
-          colnames(.tmp) <- c("start", "end", "ancstate", "trait", "branch")
-          .tmp[ , "start"] <- sim[c(1:nrow(sim)) - 1, 1]
-          .tmp[ , "end"] <- sim[c(2:nrow(sim)) , 1]
-          .tmp[ , "ancstate"] <- sim[c(1:nrow(sim)) - 1, 2]
-          .tmp[ , "trait"] <- sim[c(2:nrow(sim)), 2]
-          .tmp[ , "branch"] <- i
-          sim <- .tmp
-          res[[which(names(res) == i)]] <- sim
-        } else {
-          colnames(sim) <- c("time", "trait")
-          res[[which(names(res) == i)]] <- sim
-          res[[which(names(res) == i)]][ , 1] <- res[[which(names(res) == i)]][ , 1] + getPL(tree, node = tree$edge[i, 1])          
-        }
-      }
+      bl <- tree$edge.length[i]
+      refbl <- reftree$edge.length[i]
+      blrat <- refbl / bl
+      leading <- which(tree$edge[ , 2] == tree$edge[i, 1])
     }
+
+    if (length(leading) == 0) {
+      strt <- startval
+    } else if (!leading %in% allbranches) {
+      strt <- startval
+    } else {
+      tmp <- res[[which(names(res) == leading)]]
+      strt <- tmp[nrow(tmp), "trait"]
+    }
+    
+    sim <- branchChangeSim(branchtime = bl, direction = directional, startval = strt, var = (sigsq * blrat), 
+        increment = increment)
+    .sim <- matrix(ncol = 3, nrow = nrow(sim))
+    .sim[ , 3] <- tree$edge[i, 2]
+    .sim[ , c(1, 2)] <- sim[ , c(1, 2)]
+    sim <- .sim
+    if (segments) {
+      sim[ , 1] <- sim[ , 1]+ getPL(tree, node = tree$edge[i, 1])
+      .tmp <- matrix(ncol = 6, nrow = (nrow(sim) - 1))
+      colnames(.tmp) <- c("start", "end", "ancstate", "trait", "branch", "descNode")
+      .tmp[ , "start"] <- sim[c(1:nrow(sim)) - 1, 1]
+      .tmp[ , "end"] <- sim[c(2:nrow(sim)) , 1]
+      .tmp[ , "ancstate"] <- sim[c(1:nrow(sim)) - 1, 2]
+      .tmp[ , "trait"] <- sim[c(2:nrow(sim)), 2]
+      .tmp[ , "branch"] <- i
+      .tmp[ , "descNode"] <- tree$edge[i , 2]
+      sim <- .tmp
+      res[[which(names(res) == i)]] <- sim
+    } else {
+      colnames(sim) <- c("time", "trait", "descNode")
+      res[[which(names(res) == i)]] <- sim
+      res[[which(names(res) == i)]][ , 1] <- res[[which(names(res) == i)]][ , 1] + getPL(tree, node = tree$edge[i, 1])          
+    }
+  }
 
   if (segments) {
     res <- do.call(rbind, res)
@@ -110,10 +86,11 @@ cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", dir
       print(p + t)
     }    
   } else {
-    test <- melt(res)
-    part1 <- test[test$Var2 == "time", ]
-    part2 <- test[test$Var2 == "trait", ]
-    res <- data.frame(time = part1$value, trait = part2$value, branch = part1$L1)    
+    res <- melt(res)
+    time <- res[res$Var2 == "time", ]
+    trait <- res[res$Var2 == "trait", ]
+    descNode <- res[res$Var2 == "descNode", ]
+    res <- data.frame(time = time$value, trait = trait$value, branch = time$L1, descNode = descNode$value)    
     if (plot) {
       p <- ggplot(res, aes(x = time, y = trait, group = branch))
       print(p + geom_line())
