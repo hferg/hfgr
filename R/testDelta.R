@@ -16,8 +16,8 @@ testDelta <- function(tree, datafile, node = "root") {
   d <- read.table(datafile)
   tips <- getTipNames(tree, node)
   subtree <- drop.tip(tree, tree$tip.label[!tree$tip.label %in% tips])
-  res <- matrix(ncol = 5, nrow = length(c(2:ncol(d))))
-  colnames(res) <- c("bm", "bmss", "delta", "deltaval", "delss")
+  res <- matrix(ncol = 6, nrow = length(c(2:ncol(d))))
+  colnames(res) <- c("bm", "bmss", "delta", "deltaval", "delss", "p-value")
   
   for (i in 2:ncol(d)) {
     subdata <- d[ , i]
@@ -30,6 +30,7 @@ testDelta <- function(tree, datafile, node = "root") {
     res[i-1, "delta"] <- del$opt$lnL
     res[i-1, "deltaval"] <- del$opt$delta
     res[i-1, "delss"] <- del$opt$sigsq
+    res[i-1, "p-value"] <- 1 - pchisq((del$opt$lnL - bm$opt$lnL) * 2, df = 1)
   }
   rownames(res) <- c(1:(ncol(d) - 1))
   return(data.frame(res))
