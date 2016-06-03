@@ -16,7 +16,7 @@ testDelta <- function(tree, datafile, node = "root") {
   d <- read.table(datafile)
   tips <- getTipNames(tree, node)
   subtree <- drop.tip(tree, tree$tip.label[!tree$tip.label %in% tips])
-  res <- matrix(ncol = 5, nrow = length(c(2:ncol(.data))))
+  res <- matrix(ncol = 5, nrow = length(c(2:ncol(d))))
   colnames(res) <- c("bm", "bmss", "delta", "deltaval", "delss")
   
   for (i in 2:ncol(d)) {
