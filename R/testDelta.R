@@ -32,5 +32,5 @@ testDelta <- function(tree, datafile, node = "root") {
     res[i-1, "delss"] <- del$opt$sigsq
   }
   rownames(res) <- c(1:(ncol(d) - 1))
-  return(res)
+  return(data.frame(res))
 }
