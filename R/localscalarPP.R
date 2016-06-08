@@ -5,12 +5,14 @@
 #' @param tree The tree the analysis was run on
 #' @param burnin The burnin (if required) for the mcmc (generally worked out from the other logfile)
 #' @param thinning Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.
-#' @param returnscales A vector of descendant nodes describing branches for which to return full distributions of scalars for.
+#' @param returnscales Return full distributions of all scalar values that hit each node?
+#' @param returnorigins Return a list of the values of each scalar that originates at each node per iteration? 
 #' @import phytools
 #' @export
 #' @name localscalarPP
 
-localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, returnscales = FALSE) {
+localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, returnscales = FALSE,
+  returnorigins = FALSE) {
   # load the sample of trees.
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -108,6 +110,23 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   deltas <- vector(mode = "list", length = nrow(counts))
   kappas <- vector(mode = "list", length = nrow(counts))
   lambdas <- vector(mode = "list", length = nrow(counts))
+  names(rates) <- c("root", extree$edge[ , 2])
+  names(deltas) <- c("root", extree$edge[ , 2])
+  names(kappas) <- c("root", extree$edge[ , 2])
+  names(lambdas) <- c("root", extree$edge[ , 2])
+
+  # make lists for the origins of deltas etc.
+  .tmp <- rep(1, length(ratesperit))
+  node_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  branch_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  delta_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  lambda_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  kappa_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  names(node_origins) <- c("root", extree$edge[ , 2])
+  names(branch_origins) <- c("root", extree$edge[ , 2])
+  names(delta_origins) <- c("root", extree$edge[ , 2])
+  names(lambda_origins) <- c("root", extree$edge[ , 2])
+  names(kappa_origins) <- c("root", extree$edge[ , 2])
 
   for (i in 1:length(ratesperit)) {
     print(paste("Iteration", i, "of", length(ratesperit)))
@@ -156,6 +175,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
           # Finally record the rates.
+          if (mrca == length(extree$tip.label) + 1) {
+            node_origins$root[i] <- currentscale
+          } else {
+            node_origins[[which(names(node_origins) == mrca)]][i] <- currentscale
+          }
+
           for (k in which(rws)) {
               iteration_rates[k] <- iteration_rates[[k]] * currentscale
           }
@@ -170,7 +195,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           counts[counts[, "descNode"] == mrca, "nOrgnBRate"] <- counts[counts[, "descNode"] == mrca, "nOrgnBRate"] + 1          
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "rate"] == 0, "rate"] <- 1
-          # Finally record the deltas.
+          # Finally record the rates.
+          if (mrca == length(extree$tip.label) + 1) {
+            branch_origins$root[i] <- currentscale
+          } else {
+            branch_origins[[which(names(branch_origins) == mrca)]][i] <- currentscale
+          }          
           for (k in which(rws)) {
               iteration_rates[k] <- iteration_rates[[k]] * currentscale
           }
@@ -186,12 +216,18 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           counts[counts[, "descNode"] %in% descs , "nDelta"] <- counts[counts[, "descNode"] %in% descs , "nDelta"] + 1
           counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
           counts[counts[, "descNode"] == mrca, "nOrgnDelta"] <- counts[counts[, "descNode"] == mrca, "nOrgnDelta"] + 1
+          delta_origins
           # Then adjust the comptable to a) record yes or no for being scaled at all, and b) record 
           # yes or no for each of the scalars.
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "delta"] == 0, "delta"] <- 1
 
           # Finally record the deltas.
+          if (mrca == length(extree$tip.label) + 1) {
+            delta_origins$root[i] <- currentscale
+          } else {
+            delta_origins[[which(names(delta_origins) == mrca)]][i] <- currentscale
+          }
           for (k in which(rws)) {
             deltas[[k]] <- c(deltas[[k]], currentscale)
           }
@@ -206,6 +242,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "kappa"] == 0, "kappa"] <- 1
           # Finally record the kappas.
+          if (mrca == length(extree$tip.label) + 1) {
+            kappa_origins$root[i] <- currentscale
+          } else {
+            kappa_origins[[which(names(kappa_origins) == mrca)]][i] <- currentscale
+          }          
           for (k in which(rws)) {
             kappas[[k]] <- c(kappas[[k]], currentscale)
           }
@@ -220,6 +261,11 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
           comptable[rws & comptable[ , "lambda"] == 0, "lambda"] <- 1
           # Finally record the lambdas.
+          if (mrca == length(extree$tip.label) + 1) {
+            lambda_origins$root[i] <- currentscale
+          } else {
+            lambda_origins[[which(names(lambda_origins) == mrca)]][i] <- currentscale
+          }          
           for (k in which(rws)) {
             lambdas[[k]] <- c(lambdas[[k]], currentscale)
           }
@@ -368,10 +414,18 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   counts <- counts[ , keeps]
   meantree <- extree
   meantree$edge.length <- counts[c(2:nrow(counts)) , "meanBL"]
-  if (returnscales == TRUE) {
-    res <- list(data = counts, niter = length(ratesperit), rates = rates, deltas = deltas, kappas = kappas, lambdas = lambdas, meantree = meantree)
-  } else {
-    res <- list(data = counts, niter = length(ratesperit), meantree = meantree)
+  
+  res <- list(data = counts, meantree = meantree, niter = length(ratesperit))
+
+  if (returnscales) {
+    scalars <- list(rate = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
+    res <- c(res, list(scalars = scalars))
   }
+
+  if (returnorigins) {
+    origins <- list(nodes = node_origins, branches = branch_origins, deltas = delta_origins, kappas = kappa_origins, lambdas = lambda_origins)
+    res <- c(res, list(origins = origins))
+  }
+
   return(res)
 }

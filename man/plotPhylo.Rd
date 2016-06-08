@@ -5,7 +5,7 @@
 \title{plotPhylo}
 \usage{
 plotPhylo(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
-  main = "", edge.cols = NULL)
+  main = "", edge.cols = "black")
 }
 \arguments{
 \item{tree}{An object of class phylo}
