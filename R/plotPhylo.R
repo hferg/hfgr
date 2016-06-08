@@ -14,7 +14,7 @@
 
 plotPhylo <- function(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1, main = "",
   edge.cols = NULL) {
-  plot(tree, show.tip.label = tips, cex = cex, main = main, edge.cols = edge.cols)
+  plot(tree, show.tip.label = tips, cex = cex, main = main, edge.color = edge.cols)
   if (!is.null(nodes)) {
     if (is.numeric(nodes)) {
       nodelabels(node = nodes, cex = cex)
