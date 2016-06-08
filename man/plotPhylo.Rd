@@ -5,7 +5,7 @@
 \title{plotPhylo}
 \usage{
 plotPhylo(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
-  main = "")
+  main = "", edge.cols = NULL)
 }
 \arguments{
 \item{tree}{An object of class phylo}
@@ -19,6 +19,8 @@ plotPhylo(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
 \item{cex}{Scaling factor for tip labels and node labels - universal.}
 
 \item{main}{A string that will be the title on the plot (if desired)}
+
+\item{edge.cols}{A vector of edge colours, if you want the edges to be coloured.}
 }
 \description{
 A silly little function that makes plotting a tree without tip labels and with
