@@ -13,8 +13,9 @@
 #' @export
 
 plotPhylo <- function(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1, main = "",
-  edge.cols = "black") {
-  plot(tree, show.tip.label = tips, cex = cex, main = main, edge.color = edge.cols)
+  edge.cols = "black", edge.width = 1) {
+  plot(tree, show.tip.label = tips, cex = cex, main = main, edge.color = edge.cols, 
+    edge.width = edge.width)
   if (!is.null(nodes)) {
     if (is.numeric(nodes)) {
       nodelabels(node = nodes, cex = cex)
