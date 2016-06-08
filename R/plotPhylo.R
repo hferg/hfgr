@@ -13,7 +13,7 @@
 #' @export
 
 plotPhylo <- function(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1, main = "",
-  edge.cols = NULL) {
+  edge.cols = "black") {
   plot(tree, show.tip.label = tips, cex = cex, main = main, edge.color = edge.cols)
   if (!is.null(nodes)) {
     if (is.numeric(nodes)) {
