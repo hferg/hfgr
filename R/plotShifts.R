@@ -13,7 +13,7 @@
 #' @export
 
 plotShifts <- function(PP, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE, 
-  threshold = 0, direction = TRUE) {
+  threshold = 0, direction = TRUE, edge.cols = "black") {
 
   tree <- PP$meantree
 
@@ -57,6 +57,6 @@ plotShifts <- function(PP, scalar, scaled = FALSE, colour = "black", cex = 1, ti
     shp <- 16
   }
 
-  plotPhylo(tree, tips = tips)
+  plotPhylo(tree, tips = tips, edge.cols = edge.cols)
   nodelabels(node = nodes, bg = col, pch = shp, cex = cex)
 }
