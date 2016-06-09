@@ -6,7 +6,7 @@
 \title{plotShifts}
 \usage{
 plotShifts(PP, scalar, scaled = FALSE, colour = "black", cex = 1,
-  tips = FALSE, threshold = 0)
+  tips = FALSE, threshold = 0, direction = TRUE, edge.cols = "black")
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}

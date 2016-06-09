@@ -5,12 +5,14 @@
 \title{findBranches
 Finds the branch numbers that descend from a given node of a tree.}
 \usage{
-findBranches(tree, node)
+findBranches(tree, node, tail = TRUE)
 }
 \arguments{
 \item{tree}{An object of class phylo}
 
 \item{node}{The node the descendent branches of which are of interest}
+
+\item{tail}{Include the branch leading to the node of interest, or not?}
 }
 \description{
 findBranches
