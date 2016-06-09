@@ -58,11 +58,11 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
   }
 
   if (returnnodes) {
+    res <- list(nodes = nodes, cols = col, pch = shp)
+    return(res)    
+  } else {
     plotPhylo(tree, tips = tips, edge.cols = edge.cols, edge.width = edge.width, 
       main = main, scale = scale)
     nodelabels(node = nodes, bg = col, pch = shp, cex = cex)
-  } else {
-    res <- list(nodes = nodes, cols = col, pch = shp)
-    return(res)
   }
 }
