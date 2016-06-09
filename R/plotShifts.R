@@ -13,7 +13,7 @@
 #' @export
 
 plotShifts <- function(PP, scalar, scaled = FALSE, colour = "black", cex = 1, tips = FALSE, 
-  threshold = 0) {
+  threshold = 0, direction = TRUE) {
 
   tree <- PP$meantree
 
@@ -32,18 +32,31 @@ plotShifts <- function(PP, scalar, scaled = FALSE, colour = "black", cex = 1, ti
   if (threshold != 0) {
     nodes <- PP$data$descNode[which((PP$data[ , cl] / PP$niter) >= threshold)]
     alphas <- PP$data[which((PP$data[ , cl] / PP$niter) >= threshold) , cl] / PP$niter
+    values <- PP$data[PP$data$descNode %in% nodes, ]
   } else {
     nodes <- PP$data$descNode[which(PP$data[ , cl] != threshold)]
     alphas <- (PP$data[which(PP$data[ , cl] != 0), cl] / PP$niter)
   }
 
-  col <- vector(mode = "character", length = length(nodes))
-  
+  col <- vector(mode = "character", length = length(nodes))  
 
   for (j in 1:length(alphas)) {
     col[j] <- makeTransparent(colour, alpha = alphas[j])
   }
 
+  if (direction) {
+    shp <- vector(mode = "numeric", length = length(nodes))
+    for (i in 1:length(nodes)) {
+      if (PP$data[PP$data$descNode == nodes[i], "medianDelta"] > 1) {
+        shp[i] <- 24
+      } else if (PP$data[PP$data$descNode == nodes[i], "medianDelta"] < 1) {
+        shp[i] <- 25
+      }
+    }
+  } else {
+    shp <- 16
+  }
+
   plotPhylo(tree, tips = tips)
-  nodelabels(node = nodes, col = col, pch = 16, cex = cex)
+  nodelabels(node = nodes, bg = col, pch = shp, cex = cex)
 }
