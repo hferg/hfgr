@@ -418,12 +418,12 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   res <- list(data = counts, meantree = meantree, niter = length(ratesperit))
 
   if (returnscales) {
-    scalars <- list(rate = rates, deltas = deltas, kappas = kappas, lambdas = lambdas)
+    scalars <- list(rate = rates, delta = deltas, kappa = kappas, lambda = lambdas)
     res <- c(res, list(scalars = scalars))
   }
 
   if (returnorigins) {
-    origins <- list(nodes = node_origins, branches = branch_origins, deltas = delta_origins, kappas = kappa_origins, lambdas = lambda_origins)
+    origins <- list(nodes = node_origins, branches = branch_origins, delta = delta_origins, kappa = kappa_origins, lambda = lambda_origins)
     res <- c(res, list(origins = origins))
   }
 

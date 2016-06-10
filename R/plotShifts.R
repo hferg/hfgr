@@ -16,12 +16,13 @@
 #' @param bordercol If using directional arrows, what colour is the border of the triangles?
 #' @param direction If TRUE nodes are identified with an upward triangle if the parameter is > 1 and a downward if < 1
 #' @param border.width Width of the border of the triangles if using direction.
+#' @param exludeones If plotting according to a threshold of significance, should 1s (i.e. no scalar) be excluded from the posterior when calculating average scalar?
 #' @name plotShits
 #' @export
 
 plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = TRUE, 
   scaled = "time",  cex = 1, tips = FALSE, edge.cols = "black", edge.width = 1, main = "", 
-  scale = TRUE, bordercol = "black", border.width = 1, measure = "median") {
+  scale = TRUE, bordercol = "black", border.width = 1, measure = "median", excludeones = FALSE) {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
@@ -71,7 +72,8 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
   } else if (scaled == "mean") {
       tree <- PP$meantree
   } else if (scaled == "threshold") {
-    tree <- significantTransformation(PP = PP, scalar = scalar, threshold = threshold, measure = measure)
+    tree <- significantTransformation(PP = PP, scalar = scalar, threshold = threshold, 
+      measure = measure, excludeones = excludeones)
   }
 
   plotPhylo(tree, tips = tips, edge.cols = edge.cols, edge.width = edge.width, 

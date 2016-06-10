@@ -8,7 +8,7 @@
 #' @name significantTransformation
 #' @export
 
-significantTransformation <- function(PP, scalar, measure = "median", threshold = 0) {
+significantTransformation <- function(PP, scalar, measure = "median", threshold = 0, excludeones = FALSE) {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
@@ -22,6 +22,14 @@ significantTransformation <- function(PP, scalar, measure = "median", threshold 
     cl <- "nOrgnLambda"
     par <- paste0(measure, "Lambda")
     trpar <- "lambda"
+  }
+
+  if (measure == "median") {
+    foo <- median
+  } else if (measure == "mode") {
+    foo <- modeStat
+  } else if (measure == "mean") {
+    foo <- mean
   }
 
   if (threshold != 0) {
@@ -39,7 +47,19 @@ significantTransformation <- function(PP, scalar, measure = "median", threshold 
   dlts[ , 1] <- nodes
   for (i in 1:nrow(dlts)) {
     dlts[i, 2] <- length(getTipNames(tree, dlts[i, 1]))
-    dlts[i, 3] <- PP$data[PP$data$descNode == nodes[i], par]
+    
+    if (excludeones) {
+      if (is.null(PP$origins)) {
+        stop("Post processor output must have returned scalar origins in order to exclude ones.")
+      }
+
+      .tmp <- PP$origins[[trpar]][[as.character(dlts[i, 1])]]
+      dlts[i, 3] <- foo(.tmp[.tmp != 1])
+
+    } else {
+      dlts[i, 3] <- PP$data[PP$data$descNode == nodes[i], par]
+    }
+  
   }
   dlts <- dlts[order(dlts[ , 2], decreasing = TRUE), ]
 

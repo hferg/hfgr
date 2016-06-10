@@ -4,7 +4,8 @@
 \alias{significantTransformation}
 \title{significantTransformation}
 \usage{
-significantTransformation(PP, scalar, measure = "median", threshold = 0)
+significantTransformation(PP, scalar, measure = "median", threshold = 0,
+  excludeones = FALSE)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}

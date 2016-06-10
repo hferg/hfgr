@@ -8,7 +8,7 @@
 plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
   scaled = "time", cex = 1, tips = FALSE, edge.cols = "black",
   edge.width = 1, main = "", scale = TRUE, bordercol = "black",
-  border.width = 1, measure = "median")
+  border.width = 1, measure = "median", excludeones = FALSE)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -38,6 +38,8 @@ plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
 \item{border.width}{Width of the border of the triangles if using direction.}
 
 \item{measure}{When plotting "siginficant" tree, what measure of the parameter? Median (default), mode or mean.}
+
+\item{exludeones}{If plotting according to a threshold of significance, should 1s (i.e. no scalar) be excluded from the posterior when calculating average scalar?}
 }
 \description{
 Plots the locations of the origins of scalars from the postprocessor output of bayestraits.
