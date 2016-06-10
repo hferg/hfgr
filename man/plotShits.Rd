@@ -5,23 +5,37 @@
 \alias{plotShits}
 \title{plotShifts}
 \usage{
-plotShifts(PP, scalar, scaled = FALSE, colour = "black", cex = 1,
-  tips = FALSE, threshold = 0, direction = TRUE, edge.cols = "black")
+plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
+  scaled = "time", cex = 1, tips = FALSE, edge.cols = "black",
+  edge.width = 1, main = "", scale = TRUE, bordercol = "black",
+  border.width = 1)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
 
 \item{scalar}{The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch}
 
-\item{scaled}{Logical - plot the original tree, or the mean/sclaed tree?}
+\item{threshold}{Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)}
 
 \item{colour}{The colour to use for the node circles}
+
+\item{direction}{If TRUE nodes are identified with an upward triangle if the parameter is > 1 and a downward if < 1}
+
+\item{scaled}{Plot the original tree (scaled = "time", the default), or the mean/sclaed tree (scaled = "mean") or plot the tree scaled only by scalars present above the threshold (scaled = "threshold")?}
 
 \item{cex}{The scaling factor for the size of the node circles}
 
 \item{tips}{Show tip labels?}
 
-\item{threshold}{Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)}
+\item{edge.cols}{A vector of edge colours for the phylogeny}
+
+\item{main}{Title for the plot}
+
+\item{scale}{Include scale bar?}
+
+\item{bordercol}{If using directional arrows, what colour is the border of the triangles?}
+
+\item{border.width}{Width of the border of the triangles if using direction.}
 }
 \description{
 Plots the locations of the origins of scalars from the postprocessor output of bayestraits.
