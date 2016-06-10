@@ -5,6 +5,7 @@
 #' @param PP The psotprocessor (localscalrPP) output.
 #' @param scalar The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch
 #' @param scaled Plot the original tree (scaled = "time", the default), or the mean/sclaed tree (scaled = "mean") or plot the tree scaled only by scalars present above the threshold (scaled = "threshold")?
+#' @param measure When plotting "siginficant" tree, what measure of the parameter? Median (default), mode or mean.
 #' @param colour The colour to use for the node circles
 #' @param cex The scaling factor for the size of the node circles
 #' @param tips Show tip labels?
@@ -20,7 +21,7 @@
 
 plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = TRUE, 
   scaled = "time",  cex = 1, tips = FALSE, edge.cols = "black", edge.width = 1, main = "", 
-  scale = TRUE, bordercol = "black", border.width = 1) {
+  scale = TRUE, bordercol = "black", border.width = 1, measure = "median") {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
@@ -70,20 +71,7 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
   } else if (scaled == "mean") {
       tree <- PP$meantree
   } else if (scaled == "threshold") {
-    tree <- PP$meantree
-    tree$edge.length <- PP$data$orgBL[2:nrow(PP$data)]    
-    dlts <- matrix(nrow = length(nodes), ncol = 3)
-    dlts[ , 1] <- nodes
-    for (i in 1:nrow(dlts)) {
-      dlts[i, 2] <- length(getTipNames(tree, dlts[i, 1]))
-      dlts[i, 3] <- PP$data[PP$data$descNode == nodes[i], par]
-    }
-    dlts <- dlts[order(dlts[ , 2], decreasing = TRUE), ]
-
-    for (i in 1:nrow(dlts)) {
-      tree <- treeTrans(tree, node = dlts[i , 1], param = trpar, value = dlts[i, 3])
-    }
-
+    tree <- significantTransformation(PP = PP, scalar = scalar, threshold = threshold, measure = measure)
   }
 
   plotPhylo(tree, tips = tips, edge.cols = edge.cols, edge.width = edge.width, 

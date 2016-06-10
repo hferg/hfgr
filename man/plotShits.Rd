@@ -8,7 +8,7 @@
 plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
   scaled = "time", cex = 1, tips = FALSE, edge.cols = "black",
   edge.width = 1, main = "", scale = TRUE, bordercol = "black",
-  border.width = 1)
+  border.width = 1, measure = "median")
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -36,6 +36,8 @@ plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
 \item{bordercol}{If using directional arrows, what colour is the border of the triangles?}
 
 \item{border.width}{Width of the border of the triangles if using direction.}
+
+\item{measure}{When plotting "siginficant" tree, what measure of the parameter? Median (default), mode or mean.}
 }
 \description{
 Plots the locations of the origins of scalars from the postprocessor output of bayestraits.
