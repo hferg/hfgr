@@ -14,7 +14,8 @@
 #' @return A list with two elements, the first is the tree, and the second is a list of the taxa names for each clade of the correct size identified.
 #' @export
 
-simTreeClades <- function(treesize, mintax, maxtax, clades, lambda = 0.2, mu = 0.02, complete = FALSE) {
+simTreeClades <- function(treesize, mintax, maxtax, clades, lambda = 0.2, mu = 0.02, 
+  complete = FALSE, rescale = FALSE) {
     candidates <- NULL
     att <- 1
     if (clades * maxtax >= treesize) {
