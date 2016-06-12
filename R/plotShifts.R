@@ -28,15 +28,15 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
-    par <- "medianDelta"
+    par <- paste0(measure, "Delta")
     trpar <- "delta"
   } else if (scalar == "kappa") {
     cl <- "nOrgnKappa"
-    par <- "medianKappa"
+    par <- paste0(measure, "Kappa")
     trpar <- "kappa"
   } else if (scalar == "lambda") {
     cl <- "nOrgnLambda"
-    par <- "medianLambda"
+    par <- paste0(measure, "Lambda")
     trpar <- "lambda"
   }
 
@@ -71,9 +71,9 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
   if (direction) {
     shp <- vector(mode = "numeric", length = length(nodes))
     for (i in 1:length(nodes)) {
-      if (PP$data[PP$data$descNode == nodes[i], "medianDelta"] > 1) {
+      if (PP$data[PP$data$descNode == nodes[i], par] > 1) {
         shp[i] <- 24
-      } else if (PP$data[PP$data$descNode == nodes[i], "medianDelta"] < 1) {
+      } else if (PP$data[PP$data$descNode == nodes[i], par] < 1) {
         shp[i] <- 25
       }
     }
@@ -86,6 +86,12 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
     tree$edge.length <- PP$data$orgBL[2:nrow(PP$data)]
   } else if (scaled == "mean") {
       tree <- PP$meantree
+  } else if (scaled == "median") {
+    tree <- PP$meantree
+    tree$edge.length <- PP$data$medianBL[2:nrow(PP$data)]
+  } else if (scaled == "mode") {
+    tree <- PP$meantree
+    tree$edge.length <- PP$data$modeBL[2:nrow(PP$data)]
   } else if (scaled == "threshold") {
     tree <- significantTransformation(PP = PP, scalar = scalar, threshold = threshold, 
       measure = measure, excludeones = excludeones)
