@@ -12,6 +12,13 @@
 #' @export
 
 simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL) {
+  
+  if (node == "root") {
+    node <- length(tree$tip.label) + 1
+  } else {
+    node = node
+  }
+
   nsim <- nsim
   res <- vector(mode = "list", length = nsim)
   if (!is.null(names(reftrees))) {
