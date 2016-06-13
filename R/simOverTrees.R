@@ -27,15 +27,14 @@ simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment
     nms <- c(1:length(reftrees))
   }
 
-  if (length(sigsq == 1)) {
+  if (length(sigsq) == 1) {
     sigsq <- rep(sigsq, length(reftrees))
   }
-
   for (i in 1:nsim) {
     tmp_res <- vector(mode = "list", length = length(reftrees))
     names(tmp_res) <- nms
     for (j in 1:length(reftrees)) {
-      tmp_res[[j]] <- cladeChangeSim(tree, reftree = reftrees[[j]], node = node, sigsq = sigsq[[j]], 
+      tmp_res[[j]] <- cladeChangeSim(tree, reftree = reftrees[[j]], node = node, sigsq = sigsq[j], 
         directional = direction, increment = increment)
       tmp_res[[j]]$sim <- i
     }
