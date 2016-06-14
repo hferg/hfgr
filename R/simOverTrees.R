@@ -8,10 +8,11 @@
 #' @param node A node from which to conduct the simulation.
 #' @param direction Positive selection ("pos"), negative selection ("neg"), or non directional ("non")?
 #' @param increment The size of the time interval each branch is broken down into, if NULL is calculated automatically, but may not be comparable between runs.
+#' @param tail Include the leading branch to the node in the simulations?
 #' @name simOverTrees
 #' @export
 
-simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL) {
+simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL, tail = FALSE) {
   
   if (node == "root") {
     node <- length(tree$tip.label) + 1
@@ -35,7 +36,7 @@ simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment
     names(tmp_res) <- nms
     for (j in 1:length(reftrees)) {
       tmp_res[[j]] <- cladeChangeSim(tree, reftree = reftrees[[j]], node = node, sigsq = sigsq[j], 
-        directional = direction, increment = increment)
+        directional = direction, increment = increment, tail = tail)
       tmp_res[[j]]$sim <- i
     }
 

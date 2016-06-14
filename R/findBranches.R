@@ -7,14 +7,16 @@
 #' @export
 
 findBranches <- function(tree, node, tail = TRUE) {
-  descs <- getDescs(tree, node)
-  tips <- descs[which(descs <= length(tree$tip.label))]
-  internal <- descs[which(descs > length(tree$tip.label))]
-  if (tail) {
-    allbranches <- c(which((tree$edge[ , 2] == node)), which.edge(tree, tree$tip.label[tips]))
-  } else {
-    allbranches <- c(which((tree$edge[ , 1] == node)), which.edge(tree, tree$tip.label[tips]))
+  allbranches <- NULL
+  for (i in node) {
+    descs <- getDescs(tree, i)
+    tips <- descs[which(descs <= length(tree$tip.label))]
+    internal <- descs[which(descs > length(tree$tip.label))]
+    if (tail) {
+      allbranches <- c(allbranches, which((tree$edge[ , 2] == i)), which.edge(tree, tree$tip.label[tips]))
+    } else {
+      allbranches <- c(allbranches, which((tree$edge[ , 1] == i)), which.edge(tree, tree$tip.label[tips]))
+    }
   }
-  
   return(allbranches)
 }

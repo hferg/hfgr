@@ -18,13 +18,14 @@
 #' @param border.width Width of the border of the triangles if using direction.
 #' @param exludeones If plotting according to a threshold of significance, should 1s (i.e. no scalar) be excluded from the posterior when calculating average scalar?
 #' @param relativetrans If TRUE (defaults to FALSE) the scale of transparency will go from the threshold (totally transparent) to the maximum presence (full opacity).
+#' @param transparency Plot the node labels according to their presnce in the posterior?
 #' @name plotShits
 #' @export
 
 plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = TRUE, 
   scaled = "time",  cex = 1, tips = FALSE, edge.cols = "black", edge.width = 1, main = "", 
   scale = TRUE, bordercol = "black", border.width = 1, measure = "median", excludeones = FALSE,
-  relativetrans = FALSE) {
+  relativetrans = FALSE, transparency = TRUE) {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
@@ -42,7 +43,12 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
 
   if (threshold != 0) {
     nodes <- PP$data$descNode[which((PP$data[ , cl] / PP$niter) >= threshold)]
-    alphas <- PP$data[which((PP$data[ , cl] / PP$niter) >= threshold) , cl] / PP$niter
+    
+    if (transparency) {
+      alphas <- PP$data[which((PP$data[ , cl] / PP$niter) >= threshold) , cl] / PP$niter
+    } else {
+      alphas <- rep(1, length(nodes))
+    }
 
     if (relativetrans) {
       for (i in 1:length(alphas)) {
@@ -52,7 +58,12 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
 
   } else {
     nodes <- PP$data$descNode[which(PP$data[ , cl] != threshold)]
-    alphas <- (PP$data[which(PP$data[ , cl] != 0), cl] / PP$niter)
+    
+    if (transparency) {
+      alphas <- PP$data[which((PP$data[ , cl] / PP$niter) >= threshold) , cl] / PP$niter
+    } else {
+      alphas <- rep(1, length(nodes))
+    }
 
     if (relativetrans) {
       for (i in 1:length(alphas)) {
@@ -101,7 +112,7 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
     main = main, scale = scale)
   
   if (direction) {
-    nodelabels(node = nodes, bg = col,, col = bordercol, pch = shp, 
+    nodelabels(node = nodes, bg = col, col = bordercol, pch = shp, 
       cex = cex, lwd = border.width)      
   } else {
     nodelabels(node = nodes, bg = col, pch = shp, cex = cex)  
