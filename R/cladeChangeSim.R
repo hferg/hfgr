@@ -5,12 +5,12 @@
 #' @param reftree A reference tree that may have divergent branch lengths compared the the time tree (for example, a rate scaled tree)
 #' @param node The node from which the simulation starts (defaults to root)
 #' @param plot Plot the sim to screen after running?
-#' @param tail Include the leading branch in the simulation?
+#' @param lead Include the leading branch in the simulation?
 #' @name cladeChangeSim
 #' @export
 
 cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", directional = "non", 
-    startval = 0, sigsq, plot = FALSE, increment = NULL, segments = FALSE, tail= FALSE) {
+    startval = 0, sigsq, plot = FALSE, increment = NULL, segments = FALSE, lead = FALSE) {
     # Identify all edges - getDesTips_edge returns tip LABELS descendent from the branch (edge)
     # As such, this gives you all of the branches in the clade.
     # HFG CHANGE HERE
@@ -23,7 +23,7 @@ cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", dir
   tips <- descs[which(descs <= length(tree$tip.label))]
   internal <- descs[which(descs > length(tree$tip.label))]
 
-  allbranches <- findBranches(tail = tail)
+  allbranches <- findBranches(tree, node, tail = lead)
   
   res <- vector(mode = "list", length = length(allbranches))
   names(res) <- allbranches
@@ -35,6 +35,7 @@ cladeChangeSim <- function(tree, reftree = NULL, node = "root", mode = "BM", dir
   for (i in allbranches) {
     if (is.null(reftree)) {
       bl <- tree$edge.length[i]
+      blrat <- 1
       leading <- which(tree$edge[ , 2] == tree$edge[i, 1])
     } else {
       bl <- tree$edge.length[i]

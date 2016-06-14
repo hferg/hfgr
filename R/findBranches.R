@@ -16,6 +16,7 @@ findBranches <- function(tree, node, tail = TRUE) {
       allbranches <- c(allbranches, which((tree$edge[ , 2] == i)), which.edge(tree, tree$tip.label[tips]))
     } else {
       allbranches <- c(allbranches, which((tree$edge[ , 1] == i)), which.edge(tree, tree$tip.label[tips]))
+      allbranches <- unique(allbranches)
     }
   }
   return(allbranches)
