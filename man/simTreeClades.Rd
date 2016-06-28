@@ -5,7 +5,7 @@
 \title{simTreeClades}
 \usage{
 simTreeClades(treesize, mintax, maxtax, clades, lambda = 0.2, mu = 0.02,
-  complete = FALSE)
+  complete = FALSE, rescale = FALSE)
 }
 \arguments{
 \item{treesize}{The number of tips the final tree should have.}

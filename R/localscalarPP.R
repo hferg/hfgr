@@ -17,16 +17,21 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   extree <- ladderize(tree)
   print("Loading log file.")
   rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
+    rj_output <- rjout$rj_output
+    subtrees <- subtrees
+    rjtaxa <- rjout$taxa
   print("Loading posterior trees.")
   posttrees <- read.nexus(rjtrees)
   posttrees <- posttrees[burnin:length(posttrees)]
 
   # Make a list to store descriptions of each scalar present in each iteration.
-  ratesperit <- vector(mode = "list", length = nrow(rjout$rj_output))
+  ratesperit <- vector(mode = "list", length = nrow(rj_output))
 
-  for (i in 1:nrow(rjout$rj_output)) {
+  print("Searching for scalars...")
+  pb <- txtProgressBar(min = 0, max = nrow(rj_output), style = 3)
+  for (i in 1:nrow(rj_output)) {
 
-    lastrates <- rjout$rj_output[i, !is.na(rjout$rj_output[i, ])]
+    lastrates <- rj_output[i, !is.na(rj_output[i, ])]
     
     # If the number of columns is seven, there are no scalars applied this generation.
     if (ncol(lastrates) == 7) {
@@ -47,7 +52,10 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
     scalars <- data.frame(node = node, scale = scale, created = created, nodebranchdelta = nodebranchdelta)
     
     ratesperit[[i]] <- scalars
+    setTxtProgressBar(pb, i)    
   }
+  close(pb)
+
 
   counts <- matrix(ncol = 68, nrow = (nrow(extree$edge) + 1))
 
@@ -68,7 +76,7 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   counts[ , "descNode"] <- c((length(tree$tip.label) + 1), extree$edge[ , 2])
   counts[ , "orgBL"] <- c(0, extree$edge.length)
   print("Calculating mean branch lengths.")
-  meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, thinning = thinning)
+  meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, thinning = thinning, pbar = TRUE)
   counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
   counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
   counts[ , "quart25"] <- c(0, meanbl$quart25)
@@ -128,8 +136,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
   names(lambda_origins) <- c("root", extree$edge[ , 2])
   names(kappa_origins) <- c("root", extree$edge[ , 2])
 
+  print("Processing scalars...")
+  pb <- txtProgressBar(min = 0, max = length(ratesperit), style = 3)
   for (i in 1:length(ratesperit)) {
-    print(paste("Iteration", i, "of", length(ratesperit)))
     scalars <- ratesperit[[i]]
     # make a list of all the branches, as defined by descendent node, with a column of zeroes for any scalar, rate, delta, 
     # kappa and lambda. These become ones when a scalar is place.
@@ -216,7 +225,6 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
           counts[counts[, "descNode"] %in% descs , "nDelta"] <- counts[counts[, "descNode"] %in% descs , "nDelta"] + 1
           counts[counts[, "descNode"] == mrca, "nOrgnScalar"] <- counts[counts[, "descNode"] == mrca, "nOrgnScalar"] + 1
           counts[counts[, "descNode"] == mrca, "nOrgnDelta"] <- counts[counts[, "descNode"] == mrca, "nOrgnDelta"] + 1
-          delta_origins
           # Then adjust the comptable to a) record yes or no for being scaled at all, and b) record 
           # yes or no for each of the scalars.
           comptable[rws & comptable[ , "totalscalar"] == 0, "totalscalar"] <- 1
@@ -291,7 +299,9 @@ localscalarPP <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, return
       tmp <- counts[ , "descNode"] %in% comptable[comptable[ , "lambda"] == 1, "descNode"]
       counts[tmp, "itersLambda"] <- counts[tmp, "itersLambda"] + 1
     }
+    setTxtProgressBar(pb, i)    
   }
+  close(pb)
   
   # Finally generate the descriptive stuff for the scalar values, and remove columns that are all zero.
   # Before all this it is pretty straight forward to calculate the probs for each scalar.

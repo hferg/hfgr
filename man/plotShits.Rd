@@ -9,7 +9,7 @@ plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
   scaled = "time", cex = 1, tips = FALSE, edge.cols = "black",
   edge.width = 1, main = "", scale = TRUE, bordercol = "black",
   border.width = 1, measure = "median", excludeones = FALSE,
-  relativetrans = FALSE)
+  relativetrans = FALSE, transparency = TRUE)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -41,6 +41,8 @@ plotShifts(PP, scalar, threshold = 0, colour = "black", direction = TRUE,
 \item{measure}{When plotting "siginficant" tree, what measure of the parameter? Median (default), mode or mean.}
 
 \item{relativetrans}{If TRUE (defaults to FALSE) the scale of transparency will go from the threshold (totally transparent) to the maximum presence (full opacity).}
+
+\item{transparency}{Plot the node labels according to their presnce in the posterior?}
 
 \item{exludeones}{If plotting according to a threshold of significance, should 1s (i.e. no scalar) be excluded from the posterior when calculating average scalar?}
 }

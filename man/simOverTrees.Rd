@@ -5,7 +5,8 @@
 \title{simOverTrees
 This function will simulate the expected change over a vector of named trees. It calls cladeChangeSim a bunch of times.}
 \usage{
-simOverTrees(tree, reftrees, nsim, node, sigsq, direction, increment = NULL)
+simOverTrees(tree, reftrees, nsim, node, sigsq, direction, increment = NULL,
+  lead = FALSE)
 }
 \arguments{
 \item{tree}{The original tree.}
@@ -21,6 +22,8 @@ simOverTrees(tree, reftrees, nsim, node, sigsq, direction, increment = NULL)
 \item{direction}{Positive selection ("pos"), negative selection ("neg"), or non directional ("non")?}
 
 \item{increment}{The size of the time interval each branch is broken down into, if NULL is calculated automatically, but may not be comparable between runs.}
+
+\item{lead}{Include the leading branch to the node in the simulations?}
 }
 \description{
 simOverTrees

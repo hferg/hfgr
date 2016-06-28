@@ -7,7 +7,7 @@ Simulates the expected change along all branches of a defined clade.}
 \usage{
 cladeChangeSim(tree, reftree = NULL, node = "root", mode = "BM",
   directional = "non", startval = 0, sigsq, plot = FALSE,
-  increment = NULL, segments = FALSE)
+  increment = NULL, segments = FALSE, lead = FALSE)
 }
 \arguments{
 \item{tree}{The time tree over which to simulate change.}
@@ -17,6 +17,8 @@ cladeChangeSim(tree, reftree = NULL, node = "root", mode = "BM",
 \item{node}{The node from which the simulation starts (defaults to root)}
 
 \item{plot}{Plot the sim to screen after running?}
+
+\item{lead}{Include the leading branch in the simulation?}
 }
 \description{
 cladeChangeSim

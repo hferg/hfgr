@@ -5,7 +5,7 @@
 #' @param trees The logfile for the rj trees posterior.
 #' @export
 
-meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
+meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE) {
 
   reftree <- ladderize(reftree)
   trees <- read.nexus(trees)
@@ -13,6 +13,10 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
   
   #bls <- vector(mode = "numeric", length = length(reftree$edge.length))
   bls <- matrix(nrow = length(reftree$edge.length), ncol = length(trees))
+
+  if (pbar) {
+    pb <- txtProgressBar(min = 0, max = length(trees), style = 3)
+  }
   
   for (i in 1:length(trees)) {
     tree <- ladderize(trees[[i]])
@@ -27,6 +31,9 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
     
     bls[ , i] <- tree$edge.length
     
+    if (pbar) {
+      setTxtProgressBar(pb, i)
+    }
   }
   
   rangebl <- vector(mode = "numeric", length = nrow(bls)) 
@@ -53,5 +60,8 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1) {
               quart25 = quart25, 
               quart75 = quart75, 
               rangescalar = rangebl)
+  if (pbar) {
+    close(pb)
+  }
   return(res)
 }

@@ -4,7 +4,7 @@
 \alias{meanBranches}
 \title{meanbranches}
 \usage{
-meanBranches(reftree, trees, burnin = 0, thinning = 1)
+meanBranches(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE)
 }
 \arguments{
 \item{reftree}{A tree that provides the reference topology (ideally the tree the analysis was run on)}
