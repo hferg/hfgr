@@ -13,7 +13,6 @@
 
 localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, returnscales = TRUE,
   returnorigins = TRUE) {
-  pboptions(char = "=", type = "txt")
 
   extree <- ladderize(tree)
   print("Loading log file.")
