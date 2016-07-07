@@ -25,7 +25,11 @@ simTreeClades <- function(treesize, mintax, maxtax, clades, lambda = 0.2, mu = 0
       print(paste("Attempt", att))
       tree <- sim.bd.taxa(treesize, numbsim = 1, lambda = lambda, mu = mu, complete = complete)[[1]]
       tree <- ladderize(tree)
-      tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
+      if (rescale == TRUE) {
+        tree$edge.length <- tree$edge.length / max(nodeHeights(tree))
+      } else if (is.numeric(rescale)) {
+        tree$edge.length <- tree$edge.length / ((sum(tree$edge.length) / nrow(tree$edge)) / rescale)
+      }
       nodes <- matrix(nrow = nrow(tree$edge), ncol = 2)
       colnames(nodes) <- c("Node", "nTips")
       nodes[ , 1] <- tree$edge[ , 2]
@@ -102,6 +106,7 @@ simTreeClades <- function(treesize, mintax, maxtax, clades, lambda = 0.2, mu = 0
       tips <- tree$tip.label[tips]
       change_taxa[[k]] <- tips
     }
+
     trees <- list(tree = tree, changed_taxa = change_taxa)
   return(trees)
 }
