@@ -13,4 +13,7 @@ loadLibs <- function() {
   library(BTRTools)
   library(caper)
   library(TreeSim)
+  library(ggtree)
+  library(grid)
+  library(ggsubplot)
 }
