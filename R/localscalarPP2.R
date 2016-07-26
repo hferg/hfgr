@@ -32,31 +32,24 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, retur
   counts <- createCountsTable(extree, meanbl)
 
   # Make a list to store descriptions of each scalar present in each iteration.
-
-  nodes <- vector(mode = "list", length = nrow(rj_output))
-  scales <- vector(mode = "list", length = nrow(rj_output))
-  types <- vector(mode = "list", length = nrow(rj_output))
-  taxa <- vector(mode = "list", length = nrow(rj_output))
-  mrcas <- vector(mode = "list", length = nrow(rj_output))
+  alltypes <- vector(mode = "list", length = nrow(rj_output))
+  allmrcas <- vector(mode = "list", length = nrow(rj_output))
 
   rates <- matrix(rep(1, nrow(counts) * nrow(rj_output)), ncol = nrow(rj_output))
   rownames(rates) <- counts[ , "descNode"]
 
   # make lists for the origins of deltas etc.
   .tmp <- rep(1, nrow(rj_output))
-  node_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  branch_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  delta_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  lambda_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  kappa_origins <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  names(node_origins) <- counts[ , "descNode"]
-  names(branch_origins) <- counts[ , "descNode"]
-  names(delta_origins) <- counts[ , "descNode"]
-  names(lambda_origins) <- counts[ , "descNode"]
-  names(kappa_origins) <- counts[ , "descNode"]
-
-  origins <- list(nodes = node_origins, branch = branch_origins, delta = delta_origins,
-      lambda = lambda_origins, kappa = kappa_origins, rates = rates)
+  Node <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Branch <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Delta <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Lambda <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Kappa <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  names(Node) <- counts[ , "descNode"]
+  names(Branch) <- counts[ , "descNode"]
+  names(Delta) <- counts[ , "descNode"]
+  names(Lambda) <- counts[ , "descNode"]
+  names(Kappa) <- counts[ , "descNode"]
 
   print("Searching for scalars...")
   pb <- txtProgressBar(min = 0, max = nrow(rj_output), style = 3)
@@ -72,26 +65,37 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, retur
       
       int <- lastrates[8:length(lastrates)]
 
-      nodes[[i]] <- unlist(c(int[grep("NodeID*", names(int))]))
-      scales[[i]] <- unlist(c(int[grep("Scale*", names(int))]))
-      types[[i]] <- unlist(c(int[grep("NodeBranch*", names(int))]))
-      taxa[[i]] <- lapply(unlist(c(int[grep("NodeID*", names(int))])), getTaxa)
-      mrcas[[i]] <- lapply(taxa[[i]], getMRCAhfg)
-      scalars <- data.frame(node = nodes[[i]], scale = scales[[i]], type = types[[i]], mrca = unlist(mrcas[[i]]))
+      
+      # TEST 
+      nodes <- unlist(c(int[grep("NodeID*", names(int))]))
+      scales <- unlist(c(int[grep("Scale*", names(int))]))
+      types <- unlist(c(int[grep("NodeBranch*", names(int))]))
+      taxa <- lapply(nodes, getTaxa)
+      mrcas <- unlist(lapply(taxa, getMRCAhfg))
+      alltypes[[i]] <- types
+      allmrcas[[i]] <- mrcas
+      # /TEST
+
+      for (j in 1:length(mrcas)) {
+        nm <- paste0(types[j], "[[\"", as.character(mrcas[j]), "\"]]", "[", i, "]")
+        eval(parse(text = paste0(nm, "<-", scales[j])))
+      }
+
+      #scalars <- data.frame(node = nodes[[i]], scale = scales[[i]], type = types[[i]], mrca = unlist(mrcas[[i]]))
+      
     }
-    origins <- fillOrigins(scalars = scalars, i = i, origins = origins)
+    #origins <- fillOrigins(scalars = scalars, i = i, origins = origins)
     setTxtProgressBar(pb, i)    
   }
+  origins <- list(nodes = Node, branch = Branch, delta = Delta,
+    lambda = Lambda, kappa = Kappa, rates = rates)
   close(pb)
 
   # Make a list the same length for the taxa descendent from each node in nodes, and the mrca 
   # on the tree for each of those nodes. 
 
-  allnodes <- unlist(nodes)
-  allscales <- as.numeric(unlist(scales))
-  alltypes <- unlist(types)
-  alltaxa <- unlist(taxa)
-  allmrcas <- unlist(mrcas)
+  alltypes <- unlist(alltypes)
+  allmrcas <- unlist(allmrcas)
 
   # nOrgnScalar (i.e. origins of ANY scalar) can go now - since it doesn't matter what those scalars
   # are.
@@ -104,7 +108,6 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, retur
 
   # count scalar origins.
   # This needs a little work to change the order of the bs, ns etc. to match the order in the counts table.
-
 
   counts$nOrgnBRate[counts$descNode %in% names(bs)] <- bs[match(counts$descNode[counts$descNode %in% names(bs)], names(bs))] 
   counts$nOrgnScalar[counts$descNode %in% names(bs)] <- counts$nOrgnBRate[counts$descNode %in% names(bs)] + 

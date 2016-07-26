@@ -52,7 +52,7 @@ createCountsTable <- function(extree, meanbl) {
     counts[i, "mid"] <- mean(c(hts[(i - 1), 1], hts[(i - 1), 2]))
   }
   
-  counts[ , c(13:67)] <- 0
+  counts[ , c(13:51)] <- 0
   return(counts)
 }
 
