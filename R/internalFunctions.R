@@ -16,12 +16,20 @@ createCountsTable <- function(extree, meanbl) {
 
   counts[ , "branch"] <- c(0:nrow(extree$edge))
   counts[ , "ancNode"] <- c(0, extree$edge[ , 1])
-  counts[ , "descNode"] <- c((length(tree$tip.label) + 1), extree$edge[ , 2])
+  counts[ , "descNode"] <- c((length(extree$tip.label) + 1), extree$edge[ , 2])
   counts[ , "orgBL"] <- c(0, extree$edge.length)
-  counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
-  counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
-  counts[ , "quart25"] <- c(0, meanbl$quart25)
-  counts[ , "quart75"] <- c(0, meanbl$quart75)
+  
+  if (is.list(meanbl)) {
+    counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
+    counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
+    counts[ , "quart25"] <- c(0, meanbl$quart25)
+    counts[ , "quart75"] <- c(0, meanbl$quart75)
+  } else {
+    counts[ , "meanBL"] <- rep(1, nrow(counts))
+    counts[ , "medianBL"] <- rep(1, nrow(counts))
+    counts[ , "quart25"] <- rep(1, nrow(counts))
+    counts[ , "quart75"] <- rep(1, nrow(counts))
+  }
 
   hts <- nodeHeights(extree)
   hts <- round(abs(hts - max(hts)), 4)
