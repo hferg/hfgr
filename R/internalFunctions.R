@@ -63,7 +63,7 @@ getTaxa <- function(x, subtrees) {
   return(as.numeric(unlist(taxa)))
 }
 
-getMRCAhfg <- function(x, tree) {
+getMRCAhfg <- function(x, tree, rjtaxa) {
   if (length(x) == 1) {
     mrca <- which(tree$tip.label == rjtaxa[rjtaxa[ , 1] %in% x, 2])
   } else {

@@ -70,7 +70,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       scales <- unlist(c(int[grep("Scale*", names(int))]))
       types <- unlist(c(int[grep("NodeBranch*", names(int))]))
       taxa <- lapply(nodes, getTaxa, subtrees = subtrees)
-      mrcas <- unlist(lapply(taxa, getMRCAhfg, tree = extree))
+      mrcas <- unlist(lapply(taxa, getMRCAhfg, tree = extree, rjtaxa = rjtaxa))
       alltypes[[i]] <- types
       allmrcas[[i]] <- mrcas
 
