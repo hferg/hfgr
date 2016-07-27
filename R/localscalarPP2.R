@@ -11,7 +11,7 @@
 #' @export
 #' @name localscalarPP2
 
-localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanbranches = TRUE) {
+localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanbranches = TRUE, ratestable = TRUE) {
 
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -225,6 +225,11 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
   }
 
   if (!is.null(origins$rates)) {
+
+    if (ratestable) {
+      origins$rates <- do.call(rbind, origins$rates)
+    }
+
     scalars <- list(rates = origins$rates)
     origins$rates <- NULL
     res <- c(res, list(scalars = scalars))
