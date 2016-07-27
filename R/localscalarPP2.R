@@ -20,6 +20,9 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     subtrees <- rjout$subtrees
     rjtaxa <- rjout$taxa
     niter <- nrow(rj_output)
+    taxa <- lapply(subtrees$node, getTaxa, subtrees = subtrees)
+    fullmrcas <- unlist(lapply(taxa, getMRCAhfg, tree = extree, rjtaxa = rjtaxa))
+    fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
 
   print("Loading posterior trees.")
   posttrees <- read.nexus(rjtrees)
@@ -69,8 +72,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
       nodes <- unlist(c(int[grep("NodeID*", names(int))]))
       scales <- unlist(c(int[grep("Scale*", names(int))]))
       types <- unlist(c(int[grep("NodeBranch*", names(int))]))
-      taxa <- lapply(nodes, getTaxa, subtrees = subtrees)
-      mrcas <- unlist(lapply(taxa, getMRCAhfg, tree = extree, rjtaxa = rjtaxa))
+      mrcas <- sapply(nodes, function(x) fullmrcas[fullmrcas$node %in% x, "mrca"])
       alltypes[[i]] <- types
       allmrcas[[i]] <- mrcas
 
@@ -78,11 +80,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
         nm <- paste0(types[j], "[[\"", as.character(mrcas[j]), "\"]]", "[", i, "]")
         eval(parse(text = paste0(nm, "<-", scales[j])))
       }
-
-      #scalars <- data.frame(node = nodes[[i]], scale = scales[[i]], type = types[[i]], mrca = unlist(mrcas[[i]]))
-      
     }
-    #origins <- fillOrigins(scalars = scalars, i = i, origins = origins)
     setTxtProgressBar(pb, i)    
   }
 
