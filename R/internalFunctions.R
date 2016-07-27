@@ -56,7 +56,7 @@ createCountsTable <- function(extree, meanbl) {
   return(counts)
 }
 
-getTaxa <- function(x) {
+getTaxa <- function(x, subtrees) {
   taxa <- subtrees[subtrees$node == x, ]
   taxa <- taxa[ , !is.na(taxa)]
   taxa <- taxa[c(4:length(taxa))]
