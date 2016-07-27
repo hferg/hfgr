@@ -11,7 +11,7 @@
 #' @export
 #' @name localscalarPP2
 
-localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
+localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanbranches = TRUE) {
 
   extree <- ladderize(tree)
   print("Loading log file.")
@@ -27,9 +27,14 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   print("Loading posterior trees.")
   posttrees <- read.nexus(rjtrees)
   posttrees <- posttrees[burnin:length(posttrees)]
-  print("Calculating mean branch lengths.")
-  meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, 
-    thinning = thinning, pbar = TRUE)
+  
+  if (meanbranches) {
+    print("Calculating mean branch lengths.")
+    meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, 
+      thinning = thinning, pbar = TRUE)
+  } else {
+    meanbl = FALSE
+  }
 
   counts <- createCountsTable(extree, meanbl)
 
@@ -183,8 +188,10 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
   counts <- counts[ , apply(counts, 2, function(x) all(x != 1))]
   counts <- counts[ , apply(counts, 2, function(x) all(x != 0))]
 
-  meantree <- extree
-  meantree$edge.length <- counts[c(2:nrow(counts)) , "meanBL"]
+  if (meanbranches) {
+    meantree <- extree
+    meantree$edge.length <- counts[c(2:nrow(counts)) , "meanBL"]
+  }
 
   if (all(sapply(origins$delta, function(x) all(x == 1)))) {
     origins$delta <- NULL
@@ -210,7 +217,11 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1) {
     origins$rates <- NULL
   }
 
-  res <- list(data = counts, niter = niter, meantree = meantree)
+  if (meanbranches) { 
+    res <- list(data = counts, niter = niter, meantree = meantree)
+  } else {
+    res <- list(data = counts, niter = niter)
+  }
 
   if (!is.null(origins$rates)) {
     scalars <- list(rates = origins$rates)
