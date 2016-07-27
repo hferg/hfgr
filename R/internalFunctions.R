@@ -72,23 +72,9 @@ getMRCAhfg <- function(x, tree = extree) {
   return(mrca)
 }
 
-fillOrigins <- function(scalars, i = i, origins) {
-  for (j in 1:nrow(scalars)) {
-    nd <- scalars$mrca[j]
-    if (scalars$type[j] == "Delta") {
-      origins$delta[names(origins$delta) == nd][[1]][i] <- as.numeric(as.character(scalars$scale[j]))
-    } else if (scalars$type[j] == "Kappa") {
-      origins$kappa[names(origins$kappa) == nd][[1]][i] <- as.numeric(as.character(scalars$scale[j]))
-    } else if (scalars$type[j] == "Lambda") {
-      origins$lambda[names(origins$lambda) == nd][[1]][i] <- as.numeric(as.character(scalars$scale[j]))
-    } else if (scalars$type[j] == "Branch") {
-      origins$branch[names(origins$branch) == nd][[1]][i] <- as.numeric(as.character(scalars$scale[j]))
-      origins$rates[rownames(origins$rates) == nd, i] <- origins$rates[rownames(origins$rates) == nd, i] * as.numeric(as.character(scalars$scale[j]))
-    } else if (scalars$type[j] == "Node") {
-      descs <- getDescs(extree, nd)
-      origins$nodes[names(origins$nodes) == nd][[1]][i] <- as.numeric(as.character(scalars$scale[j]))
-      origins$rates[rownames(origins$rates) %in% descs, i] <- origins$rates[rownames(origins$rates) %in% descs, i] * as.numeric(as.character(scalars$scale[j]))
-    }
-  }
-  return(origins)
+multiplyNodes <- function(scales, name, tree, Node_effects) {
+  # get descendents
+  descs <- getDescs(tree, name)
+  .tmp <- lapply(Node_effects[as.character(descs)], function(x) x * scales)
+  return(.tmp)
 }
