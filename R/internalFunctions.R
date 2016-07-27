@@ -82,7 +82,7 @@ getMRCAhfg <- function(x, tree, rjtaxa) {
 
 multiplyNodes <- function(scales, name, tree, Node_effects) {
   # get descendents
-  descs <- getDescs(tree, name)
+  descs <- c(getDescs(tree, name), as.numeric(name))
   .tmp <- lapply(Node_effects[as.character(descs)], function(x) x * scales)
   return(.tmp)
 }
