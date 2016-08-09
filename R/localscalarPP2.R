@@ -16,6 +16,15 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
   extree <- ladderize(tree)
   print("Loading log file.")
   rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
+
+  if (meanbranches) {
+    print("Calculating mean branch lengths.")
+    meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, 
+      thinning = thinning, pbar = TRUE)
+  } else {
+    meanbl = FALSE
+  }
+
     rj_output <- rjout$rj_output
     subtrees <- rjout$subtrees
     rjtaxa <- rjout$taxa
@@ -29,14 +38,6 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
   posttrees <- read.nexus(rjtrees)
   posttrees <- posttrees[burnin:length(posttrees)]
   
-  if (meanbranches) {
-    print("Calculating mean branch lengths.")
-    meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, 
-      thinning = thinning, pbar = TRUE)
-  } else {
-    meanbl = FALSE
-  }
-
   counts <- createCountsTable(extree, meanbl)
 
   # Make a list to store descriptions of each scalar present in each iteration.
