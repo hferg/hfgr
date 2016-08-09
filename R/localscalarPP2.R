@@ -13,6 +13,8 @@
 
 localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanbranches = TRUE, ratestable = TRUE) {
 
+  pboptions(type = "txt", style = 3, char = "=")
+
   extree <- ladderize(tree)
   print("Loading log file.")
   rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
@@ -29,9 +31,10 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
     subtrees <- rjout$subtrees
     rjtaxa <- rjout$taxa
     niter <- nrow(rj_output)
-    print("Finding taxa and MRCAs.")
-    taxa <- lapply(subtrees$node, getTaxa, subtrees = subtrees)
-    fullmrcas <- unlist(lapply(taxa, getMRCAhfg, tree = extree, rjtaxa = rjtaxa))
+    print("Finding taxa.")
+    taxa <- pblapply(subtrees$node, function(x) getTaxa(x, subtrees = subtrees))
+    print("Calculating MRCAs.")
+    fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
     fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
 
   print("Loading posterior trees.")
