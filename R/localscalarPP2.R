@@ -32,7 +32,10 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
     rjtaxa <- rjout$taxa
     niter <- nrow(rj_output)
     print("Finding taxa.")
-    taxa <- pblapply(subtrees$node, function(x) getTaxa(x, subtrees = subtrees))
+    
+    system.time(pblapply(subtrees$node, function(x) getTaxa(x, subtrees = subtrees)))
+    
+
     print("Calculating MRCAs.")
     fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
     fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)

@@ -15,5 +15,6 @@ loadLibs <- function() {
   library(TreeSim)
   library(ggtree)
   library(grid)
-  library(ggsubplot)
+  library(pbapply)
+  library(paleotree)
 }
