@@ -37,7 +37,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
     
 
     print("Calculating MRCAs.")
-    fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
+    fullmrcas <- unlist(pblapply(rjtaxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
     fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
 
   print("Loading posterior trees.")
