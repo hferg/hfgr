@@ -20,17 +20,36 @@ localDelta <- function(tree, node, delta, rescale = TRUE) {
   # And now apply the delta transformation to that new subtree, which means I don't need to 
   # work out transformed edges etc.
 
+  # n <- Ntip(subtree)
+  # hts <- phyloHeights(subtree)
+  # T <- hts$start[n + 1]
+  # hts$t <- T - hts$end
+  # hts$e <- hts$start - hts$end
+  # hts$a <- hts$t - hts$e
+  # hts$a[hts$a < 0] <- 0 
+
+  # bls <- (hts$a + hts$e) ^ delta - hts$a ^ delta
+
+  # subtree$edge.length <- bls[subtree$edge[ , 2]]
+
   n <- Ntip(subtree)
-  hts <- phyloHeights(subtree)
-  T <- hts$start[n + 1]
+  hts <- data.frame(nodeHeights(subtree))
+  colnames(hts) <- c("start", "end")
+  T <- max(hts[,1])
+
+  # Into heights I need to get the path length (the length from the root of the tree to that
+  # node) and the branch length (which ought to be the end - the start)
+
   hts$t <- T - hts$end
-  hts$e <- hts$start - hts$end
-  hts$a <- hts$t - hts$e
-  hts$a[hts$a < 0] <- 0 
+  hts$bl <- hts$end - hts$start
 
-  bls <- (hts$a + hts$e) ^ delta - hts$a ^ delta
+  # hts$pl <- hts$t - hts$e
 
-  subtree$edge.length <- bls[subtree$edge[ , 2]]
+  # hts$pl[hts$pl < 0] <- 0 
+
+  bls <- (hts$start + hts$bl) ^ delta - hts$start ^ delta
+
+  subtree$edge.length <- bls  
 
   if (rescale) {
     scale <- T ^ delta
