@@ -3,6 +3,6 @@
 #' @name hfgr
 #' @author Henry Ferguson-Gow
 #' @docType package
-#' @import ggplot2 gridExtra phytools ape caper TreeSim reshape2 geiger pbapply
+#' @import ggplot2 gridExtra phytools ape caper TreeSim reshape2 geiger pbapply plotrix
 
 NULL
