@@ -32,6 +32,10 @@ simuDatRate <- function(tree, transtree = NULL, node, a, sig, dat = NULL, method
     transtree <- tree
   }
 
+  if (node == "root") {
+    node <- length(tree$tip.label) + 1
+  }
+
   descs <- c(getDescs(transtree, node), node)
   internal <- descs[descs > length(transtree$tip.label)]
   tips <- descs[descs < length(transtree$tip.label)]

@@ -86,6 +86,8 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "black", direction = 
         shp[i] <- 24
       } else if (PP$data[PP$data$descNode == nodes[i], par] < 1) {
         shp[i] <- 25
+      } else if (PP$data[PP$data$descNode == nodes[i], par] == 1) {
+        shp[i] <- 16
       }
     }
   } else {

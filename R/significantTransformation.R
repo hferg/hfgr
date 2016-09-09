@@ -63,8 +63,12 @@ significantTransformation <- function(PP, scalar, measure = "median", threshold 
   }
   dlts <- dlts[order(dlts[ , 2], decreasing = TRUE), ]
 
-  for (i in 1:nrow(dlts)) {
-    tree <- treeTrans(tree, node = dlts[i , 1], param = trpar, value = dlts[i, 3])
+  if (!is.vector(dlts)) {
+    for (i in 1:nrow(dlts)) {
+      tree <- treeTrans(tree, node = dlts[i , 1], param = trpar, value = dlts[i, 3])
+    }
+  } else {
+    tree <- treeTrans(tree, node = dlts[1], param = trpar, value = dlts[3])
   }
 
   return(tree)
