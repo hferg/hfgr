@@ -136,10 +136,12 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "red", direction = FA
   plotPhylo(tree, tips = tips, edge.cols = edge.cols, edge.width = edge.width, 
     main = main, scale = scale)
   
-  if (direction) {
-    nodelabels(node = nodes, bg = col, col = bordercol, pch = shp, 
-      cex = cex, lwd = border.width)      
-  } else {
-    nodelabels(node = nodes, bg = col, pch = shp, cex = cex)  
+  if (scalar != "rate") {
+    if (direction) {
+      nodelabels(node = nodes, bg = col, col = bordercol, pch = shp, 
+        cex = cex, lwd = border.width)      
+    } else {
+      nodelabels(node = nodes, bg = col, pch = shp, cex = cex)  
+    }
   }
 }
