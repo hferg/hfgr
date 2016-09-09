@@ -26,7 +26,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 
   if (meanbranches) {
     print("Calculating mean branch lengths.")
-    meanbl <- meanBranches(reftree = extree, trees = rjtrees, burnin = burnin, 
+    meanbl <- meanBranches(reftree = extree, trees = posttrees, burnin = burnin, 
       thinning = thinning, pbar = TRUE)
   } else {
     meanbl = FALSE
