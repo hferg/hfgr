@@ -9,7 +9,7 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE)
 
   reftree <- ladderize(reftree)
   
-  if (class(trees) == "multiphylo") {
+  if (class(trees) == "multiPhylo") {
     trees <- trees
   } else {
     trees <- read.nexus(trees)
