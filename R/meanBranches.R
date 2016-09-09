@@ -8,7 +8,13 @@
 meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE) {
 
   reftree <- ladderize(reftree)
-  trees <- read.nexus(trees)
+  
+  if (class(trees) == "multiphylo") {
+    trees <- trees
+  } else {
+    trees <- read.nexus(trees)
+  }
+  
   trees <- trees[seq.int(burnin, length(trees), thinning)]
   
   #bls <- vector(mode = "numeric", length = length(reftree$edge.length))

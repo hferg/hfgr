@@ -11,13 +11,18 @@
 #' @export
 #' @name localscalarPP2
 
-localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanbranches = TRUE, ratestable = TRUE) {
+localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, 
+  meanbranches = TRUE, ratestable = TRUE) {
 
   pboptions(type = "txt", style = 3, char = "=")
 
   extree <- ladderize(tree)
   print("Loading log file.")
   rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
+
+  print("Loading posterior trees.")
+  posttrees <- read.nexus(rjtrees)
+  posttrees <- posttrees[burnin:length(posttrees)]
 
   if (meanbranches) {
     print("Calculating mean branch lengths.")
@@ -39,9 +44,7 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, meanb
     fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
     fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
 
-  print("Loading posterior trees.")
-  posttrees <- read.nexus(rjtrees)
-  posttrees <- posttrees[burnin:length(posttrees)]
+
   
   counts <- createCountsTable(extree, meanbl)
 
