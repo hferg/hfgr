@@ -12,7 +12,8 @@
 #' @name simOverTrees
 #' @export
 
-simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction, increment = NULL, lead = FALSE) {
+simOverTrees <- function(tree, reftrees, nsim, node, sigsq, direction = "non", increment = NULL, 
+  lead = FALSE) {
   
   if (node == "root") {
     node <- length(tree$tip.label) + 1

@@ -8,7 +8,8 @@
 #' @name significantTransformation
 #' @export
 
-significantTransformation <- function(PP, scalar, measure = "median", threshold = 0, excludeones = FALSE) {
+significantTransformation <- function(PP, scalar, measure = "median", threshold = 0, 
+  excludeones = FALSE) {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
