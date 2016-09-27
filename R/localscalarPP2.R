@@ -77,9 +77,9 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
     
     # If the number of columns is seven, there are no scalars applied this generation.
     if (ncol(lastrates) == 7) {
-      nodes[[i]] <- NA
-      scales[[i]] <- NA
-      types[[i]] <- NA
+      nodes <- NA
+      scales <- NA
+      types <- NA
     } else {
       
       int <- lastrates[8:length(lastrates)]
