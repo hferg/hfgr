@@ -13,7 +13,7 @@ loadLibs <- function() {
   library(BTRTools)
   library(caper)
   library(TreeSim)
-  library(ggtree)
+  library(gridExtra)
   library(grid)
   library(pbapply)
   library(paleotree)
