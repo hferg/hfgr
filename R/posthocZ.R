@@ -1,7 +1,7 @@
 #' posthocZ
 #' 
 #' Simulates a trait over the posterior sample of trees, and then calculates z scores.
-#' @param tree The time tree
+#' @param tree The time tree, an object of class phylo, or the filename of the tree to load.
 #' @param rjtrees The posterior of trees in multiphylo form, or the filename of the posterior.
 #' @param nsim The number of simulations per tree in the posterior.
 #' @export
@@ -11,6 +11,12 @@ posthocZ <- function(tree, rjtrees, nsim = 100) {
     posterior <- rjtrees
   } else {
     posterior <- read.nexus(rjtrees)
+  }
+
+  if (class(tree) == "phylo") {
+    tree <- tree
+  } else {
+    tree <- read.nexus(tree)
   }
 
   n <- rep(1:length(posterior), nsim)
