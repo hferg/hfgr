@@ -31,15 +31,15 @@ plotShifts <- function(PP, scalar, threshold = 0, colour = "red", direction = FA
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
     par <- paste0(measure, "Delta")
-    .mode <- "trans"
+    mode <- "trans"
   } else if (scalar == "kappa") {
     cl <- "nOrgnKappa"
     par <- paste0(measure, "Kappa")
-    .mode <- "trans"
+    mode <- "trans"
   } else if (scalar == "lambda") {
     cl <- "nOrgnLambda"
     par <- paste0(measure, "Lambda")
-    .mode <- "trans"
+    mode <- "trans"
   } else if (scalar == "rate") {
     cl <- "nOrgnScalar"
     par <- paste0(measure, "Rate")
