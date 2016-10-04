@@ -5,8 +5,8 @@
 \title{simOverTrees
 This function will simulate the expected change over a vector of named trees. It calls cladeChangeSim a bunch of times.}
 \usage{
-simOverTrees(tree, reftrees, nsim, node, sigsq, direction, increment = NULL,
-  lead = FALSE)
+simOverTrees(tree, reftrees, nsim, node, sigsq, direction = "non",
+  increment = NULL, lead = FALSE)
 }
 \arguments{
 \item{tree}{The original tree.}

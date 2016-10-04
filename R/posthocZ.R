@@ -5,6 +5,7 @@
 #' @param rjtrees The posterior of trees in multiphylo form, or the filename of the posterior.
 #' @param nsim The number of simulations per tree in the posterior.
 #' @export
+#' @name posthocZ
 
 posthocZ <- function(tree, rjtrees, nsim = 100) {
   if (class(rjtrees) == "multiPhylo") {
