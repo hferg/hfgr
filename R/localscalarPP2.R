@@ -16,7 +16,12 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 
   pboptions(type = "txt", style = 3, char = "=")
 
-  extree <- ladderize(tree)
+  if (class(tree) == "phylo") {
+    extree <- ladderize(tree)
+  } else {
+    extree <- ladderize(read.nexus(tree))
+  }
+
   print("Loading log file.")
   rjout <- loadRJ(rjlog, burnin = burnin, thinning = thinning)
 
