@@ -24,5 +24,4 @@ repData <- function(dat, n, prefix) {
   
   invisible(sapply(x, function(x) write.table(dat, file = paste0(prefix, "_", x, ".txt"), quote = FALSE, col.names = FALSE)))
 
-  # some new comments to test.
 }
