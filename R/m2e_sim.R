@@ -13,7 +13,7 @@
 #' @name simulateFlips
 #' @export
 
-simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, aminus = 0, dplus = 0, dminus = 0, dtrack = NULL) {
+simulateFlips <- function(attack, defense, TN = 0, suit = FALSE, afate = 0, dfate = 0, dtrack = NULL) {
   # TO_THINK
   #   Should this include some attempt to make the deck smaller based on what has come out of it?
   # Build the deck, include both jokers.
@@ -21,53 +21,51 @@ simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, a
 
   deck <- c(rep(c(1:13), 4), 0, 14)
   nsim <- 10000
-  attackerfate <- aplus - aminus
-  defenderfate <- dplus - dminus
   
   attackerresults <- vector(mode = "numeric", length = nsim)
   defenderresults <- vector(mode = "numeric", length = nsim)
 
-  if (attackerfate < 0) {
-    attackerflips <- abs(attackerfate) + 1
+  if (afate < 0) {
+    attackerflips <- abs(afate) + 1
     print(paste("Attacker flips", attackerflips, "cards"))
 
     for (i in 1:nsim) {
       attackerresults[i] <- attack + min(sample(deck, attackerflips, replace = FALSE))
     }
   } else {
-    attackerflips <- abs(attackerfate) + 1
+    attackerflips <- abs(afate) + 1
     print(paste("Attacker flips", attackerflips, "cards"))    
 
     for (i in 1:nsim) {
       attackerresults[i] <- attack + max(sample(deck, attackerflips, replace = FALSE))
     }
   }
+  
+  # Target number handling is incorrect.
 
-  if (!is.null(TN)) {
-    defenderresults <- rep(TN, nsim)
+  if (dfate < 0) {
+    defenderflips <- abs(dfate) + 1
+    print(paste("Defender flips", defenderflips, "cards"))
+
+    for (i in 1:nsim) {
+      defenderresults[i] <- defense + min(sample(deck, defenderflips, replace = FALSE))
+    }
   } else {
+    # choose big
+    defenderflips <- abs(dfate) + 1
+    print(paste("Defender flips", defenderflips, "cards"))
 
-    if (defenderfate < 0) {
-      defenderflips <- abs(defenderfate) + 1
-      print(paste("Defender flips", defenderflips, "cards"))
-
-      for (i in 1:nsim) {
-        defenderresults[i] <- defense + min(sample(deck, defenderflips, replace = FALSE))
-      }
-    } else {
-      # choose big
-      defenderflips <- abs(defenderfate) + 1
-      print(paste("Defender flips", defenderflips, "cards"))
-
-      for (i in 1:nsim) {
-        defenderresults[i] <- defense + max(sample(deck, defenderflips, replace = FALSE))
-      }
+    for (i in 1:nsim) {
+      defenderresults[i] <- defense + max(sample(deck, defenderflips, replace = FALSE))
     }
   }
 
   diffs <- attackerresults - defenderresults
+  wins <- diffs >= 0
+  # Set wins where attacking duel total falls short of TN to FALSE
+  wins[attackerresults < TN] <- FALSE
   
-  psuccess <- round(sum(diffs >= 0) / length(diffs), 2)
+  psuccess <- round(sum(wins) / length(diffs), 2)
 
 
   # make a nice histogram to show the attacker success distribution, and the probability of
@@ -104,6 +102,12 @@ simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, a
     x1e <- x2h
     x2e <- x2h
   }
+  
+  if (TN > 0) {
+    title <- paste0("p of success, accounting for ", TN, " TN = ", psuccess)
+  } else {
+    title <- paste0("p of success = ", psuccess)
+  }
 
   ret <- density_plot +
           geom_area(data = data.frame(x = dpb$data[[1]]$x[x1w:x2w],
@@ -118,7 +122,7 @@ simulateFlips <- function(attack, defense, TN = NULL, suit = FALSE, aplus = 0, a
           geom_area(data = data.frame(x = dpb$data[[1]]$x[x1e:x2e],
                                       y = dpb$data[[1]]$y[x1e:x2e]),
             aes(x = x, y = y), fill = "dodgerblue", alpha = 1) +                                
-          ggtitle(paste0("p of success = ", psuccess))
+          ggtitle(title)
 
   return(ret)
 }

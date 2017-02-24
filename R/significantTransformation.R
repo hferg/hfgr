@@ -5,11 +5,12 @@
 #' @param scalar The scalar to find and plot from the post processor - delta/lambda/kappa/node/branch
 #' @param measure Median (default), mean or mode scalar.
 #' @param threshold Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)
+#' @param includerates When a non-linear transformation is fitted along with variable rates it might be desireable to look at the tree scaled by rate as well as transformation. This is the threshold for significance for rates, and is disabled by default.
 #' @name significantTransformation
 #' @export
 
 significantTransformation <- function(PP, scalar, measure = "median", threshold = 0, 
-  excludeones = FALSE) {
+  excludeones = FALSE, tree = NULL, includerates = NULL) {
 
   if (scalar == "delta") {
     cl <- "nOrgnDelta"
@@ -70,6 +71,21 @@ significantTransformation <- function(PP, scalar, measure = "median", threshold 
     }
   } else {
     tree <- treeTrans(tree, node = dlts[1], param = trpar, value = dlts[3])
+  }
+
+  if (!is.null(includerates)) {
+
+    if (any(colnames(dvr$data) == "pRate")) {
+      scaled_branches <-  tree$edge[ , 2] %in% PP$data$descNode[PP$data$pRate >= includerates]
+      #remove root from scalars.
+      scalars <- PP$scalars$rate[2:nrow(PP$scalars$rate), ]
+
+      tree$edge.length[scaled_branches] <- tree$edge.length[scaled_branches] * apply(scalars[scaled_branches, ], 1, foo)
+
+    } else {
+      stop("PP does not contain linear rate scalars.")
+    }
+
   }
 
   return(tree)
