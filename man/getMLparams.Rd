@@ -12,4 +12,3 @@ getMLparams(logfile)
 \description{
 A function that will return the ML estimates from the logfile of an ML bayestraits run.
 }
-

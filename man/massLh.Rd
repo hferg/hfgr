@@ -13,4 +13,3 @@ massLh(prefix)
 A function that will get the likelihoods for all the starter and true log files
 in a directory, and return a data frame of those values for future comparison.
 }
-

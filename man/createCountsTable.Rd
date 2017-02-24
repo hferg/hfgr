@@ -9,4 +9,3 @@ createCountsTable(extree, meanbl)
 \description{
 #' A bunch of internal functions for hfgr, mostly for the localscalar PP.
 }
-

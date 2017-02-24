@@ -16,4 +16,3 @@ localRate(tree, node, scalar)
 \description{
 A function that transforms branch lengths according to a scalar.
 }
-

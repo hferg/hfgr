@@ -29,4 +29,3 @@ simOverTrees(tree, reftrees, nsim, node, sigsq, direction = "non",
 simOverTrees
 This function will simulate the expected change over a vector of named trees. It calls cladeChangeSim a bunch of times.
 }
-

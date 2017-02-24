@@ -64,22 +64,6 @@ createCountsTable <- function(extree, meanbl) {
   return(counts)
 }
 
-getTaxa <- function(x, subtrees) {
-  taxa <- subtrees[subtrees$node == x, ]
-  taxa <- taxa[ , !is.na(taxa)]
-  taxa <- taxa[c(4:length(taxa))]
-  return(as.numeric(unlist(taxa)))
-}
-
-getMRCAhfg <- function(x, tree, rjtaxa) {
-  if (length(x) == 1) {
-    mrca <- which(tree$tip.label == rjtaxa[rjtaxa[ , 1] %in% x, 2])
-  } else {
-    mrca <- getMRCA(tree, rjtaxa[rjtaxa[ , 1] %in% x, 2])
-  }
-  return(mrca)
-}
-
 multiplyNodes <- function(scales, name, tree, Node_effects) {
   # get descendents
   descs <- c(getDescs(tree, name), as.numeric(name))

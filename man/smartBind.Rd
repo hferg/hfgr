@@ -15,4 +15,3 @@ A function that will rbind vectors of different lengths and return a matrix, pro
 \examples{
 do.call(smartRbind, list.of.vectors)
 }
-

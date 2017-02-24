@@ -16,4 +16,3 @@ localDelta(tree, node, delta, rescale = TRUE)
 \description{
 A function that transforms a tree according to lambda, or a portion of a tree according to lambda.
 }
-

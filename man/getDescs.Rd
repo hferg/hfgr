@@ -14,4 +14,3 @@ getDescs(tree, node, nds = NULL)
 \description{
 A function to get all descendant nodes from a given node, or vector of tip labels.
 }
-

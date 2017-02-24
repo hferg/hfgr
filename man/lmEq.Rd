@@ -19,4 +19,3 @@ two variables against each other - e.g. branch lengths recoverd from rj bayes tr
 \examples{
 lmEq(data.frame(x = dat$og, y = dat$rj))
 }
-

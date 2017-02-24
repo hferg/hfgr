@@ -12,4 +12,3 @@ branchChangeSim(branchtime = 100, direction = "non", startval = 0,
 branchChangeSim
 Simulate the expected change along a branch of length branchtime.
 }
-

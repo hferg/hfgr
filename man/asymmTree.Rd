@@ -12,4 +12,3 @@ asymmTree(n)
 \description{
 Simulates a completely unbalanced tree with n tips, and branch lengths calculated according to Grafen.
 }
-

@@ -19,4 +19,3 @@ HFG: From https://github.com/hadley/ggplot2/wiki/Share-a-legend-between-two-ggpl
 \examples{
 leg <- gLegend(my_plot)
 }
-

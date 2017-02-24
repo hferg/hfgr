@@ -14,4 +14,3 @@ meanBranches(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE)
 \description{
 Calculate the mean branch lengths from a BayesTraits RJ analysis posterior, when topology is fixed.
 }
-

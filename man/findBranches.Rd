@@ -18,4 +18,3 @@ findBranches(tree, node, tail = TRUE)
 findBranches
 Finds the branch numbers that descend from a given node of a tree.
 }
-

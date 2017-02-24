@@ -12,4 +12,3 @@ makeTransparent(..., alpha = 0.5)
 \description{
 Some function from stack exchange that makes a colour transparent according to a given alpha.
 }
-

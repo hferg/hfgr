@@ -9,4 +9,3 @@ loadLibs()
 \description{
 Just a shortcut function to load all of the usual libraries at once.
 }
-

@@ -12,4 +12,3 @@ isDefined(x)
 \description{
 Internal function that tests if a variable is defined (i.e. is not NULL).
 }
-

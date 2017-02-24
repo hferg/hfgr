@@ -24,4 +24,3 @@ p3 <- qplot(color, price, data=dsamp, colour=clarity)
 p4 <- qplot(depth, price, data=dsamp, colour=clarity)
 ggplotShareLeg(p1, p2, p3, p4)
 }
-

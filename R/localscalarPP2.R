@@ -1,17 +1,179 @@
-#' localscalarPP2
+##############################################################################
+#' createCounts
+#' Creates the counts table for the rjpp.
+#' @param extree The time tree
+#' @param meanbl The output of meanBranches
+#' @name createCounts
+createCountsTable <- function(extree, meanbl) {
+  counts <- matrix(ncol = 53, nrow = (nrow(extree$edge) + 1))
+  colnames(counts) <- c("branch", "ancNode", "descNode", "nTips", "start", "end", "mid", "orgBL", 
+      "meanBL", "medianBL", "modeBL", "quart25", "quart75", 
+      "itersScaled", "itersRatescaled", "itersDelta", "itersKappa", "itersLambda", 
+      "pScaled", "pRate", "pDelta", "pKappa", "pLambda",
+      "nScalar", "nRate", "nDelta", "nKappa", "nLambda",
+      "nOrgnScalar", "nOrgnNRate", "nOrgnBRate", "nOrgnDelta", "nOrgnKappa", "nOrgnLambda",
+      "rangeRate", "lqRate", "uqRate", "meanRate", "medianRate", "modeRate",
+      "rangeDelta", "meanDelta", "medianDelta", "modeDelta",
+      "rangeKappa", "meanKappa", "medianKappa", "modeKappa",
+      "rangeLambda", "meanLambda", "medianLambda", "modeLambda", "species")
+
+  counts[ , "branch"] <- c(0:nrow(extree$edge))
+  counts[ , "ancNode"] <- c(0, extree$edge[ , 1])
+  counts[ , "descNode"] <- c((length(extree$tip.label) + 1), extree$edge[ , 2])
+  counts[ , "orgBL"] <- c(0, extree$edge.length)
+  
+  if (is.list(meanbl)) {
+    counts[ , "meanBL"] <- c(0, meanbl$meanbranches)
+    counts[ , "medianBL"] <- c(0, meanbl$medianbranches)
+    counts[ , "modeBL"] <- c(0, meanbl$modebranches)
+    counts[ , "quart25"] <- c(0, meanbl$quart25)
+    counts[ , "quart75"] <- c(0, meanbl$quart75)
+  } else {
+    counts[ , "meanBL"] <- rep(1, nrow(counts))
+    counts[ , "medianBL"] <- rep(1, nrow(counts))
+    counts[ , "modeBL"] <- rep(1, nrow(counts))
+    counts[ , "quart25"] <- rep(1, nrow(counts))
+    counts[ , "quart75"] <- rep(1, nrow(counts))
+  }
+
+  hts <- phytools::nodeHeights(extree)
+  hts <- round(abs(hts - max(hts)), 4)
+  counts[ , "start"] <- c(0, hts[ , 1])
+  counts[ , "end"] <- c(0, hts[ , 2])
+  counts <- as.data.frame(counts)
+
+  # Deal with the root
+  descs <- getDescs(extree, node = counts[1, "descNode"])
+  counts[1, "nTips"] <- sum(descs <= length(extree$tip.label))
+  counts[1, "mid"] <- 0
+  counts[1, "species"] <- paste0(extree$tip.label[order(extree$tip.label)], collapse = ",")
+
+  for (i in 2:nrow(counts)) {
+    descs <- getDescs(extree, node = counts[i, "descNode"])
+    counts[i, "nTips"] <- sum(descs <= length(extree$tip.label))
+    if (counts[i, "nTips"] == 0) {
+      counts[i, "nTips"] <- 1
+    }
+    if (counts[i, "descNode"] <= length(extree$tip.label)) {
+      counts[i, "species"] <- extree$tip.label[counts[i, "descNode"]]
+    } else {
+      tips <- getDescs(extree, counts[i, "descNode"])
+      tips <- tips[tips <= length(extree$tip.label)]
+      tips <- extree$tip.label[tips]
+      counts[i, "species"] <- paste0(sort(tips), collapse = ",")
+    }
+    counts[i, "mid"] <- mean(c(hts[(i - 1), 1], hts[(i - 1), 2]))
+  }
+  
+  counts[ , c(14:52)] <- 0
+  return(counts)
+}
+
+
+##############################################################################
+#' multiplyNodes
+#' Works out the cumulative effect of linear scalars on branches per iteration
+#' @param scales A vector of scalars for a node
+#' @param name The name of the node
+#' @param tree The time tree
+#' @param Node_effects A list, one element per node, to fill with the cumulative scalars
+#' @name multiplyNodes
+multiplyNodes <- function(scales, name, tree, Node_effects) {
+  # get descendents
+  descs <- c(getDescs(tree, name), as.numeric(name))
+  .tmp <- lapply(Node_effects[as.character(descs)], function(x) x * scales)
+  return(.tmp)
+}
+
+
+##############################################################################
+#' 
+#' scalarSearch
+#' Searches through the posterior of an RJ continuous model for scalars and 
+#' returns them.
+#' @param rj_output partially processed RJ output.
+#' @param counts The counts table.
+#' @name scalarSearch
+scalarSearch <- function(rj_output, counts) {
+  alltypes <- vector(mode = "list", length = nrow(rj_output))
+  allmrcas <- vector(mode = "list", length = nrow(rj_output))
+
+  rates <- matrix(rep(1, nrow(counts) * nrow(rj_output)), ncol = nrow(rj_output))
+  rownames(rates) <- counts[ , "descNode"]
+
+  # make lists for the origins of deltas etc.
+  .tmp <- rep(1, nrow(rj_output))
+  Node <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Branch <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Delta <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Lambda <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Kappa <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  Node_effects <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
+  names(Node) <- counts[ , "descNode"]
+  names(Branch) <- counts[ , "descNode"]
+  names(Delta) <- counts[ , "descNode"]
+  names(Lambda) <- counts[ , "descNode"]
+  names(Kappa) <- counts[ , "descNode"]
+  names(Node_effects) <- counts[ , "descNode"]
+
+  print("Searching for scalars...")
+    pb <- txtProgressBar(min = 0, max = nrow(rj_output), style = 3)
+    for (i in 1:nrow(rj_output)) {
+      lastrates <- rj_output[i, !is.na(rj_output[i, ])]
+      
+      # If the number of columns is seven, there are no scalars applied this generation.
+      if (ncol(lastrates) == 7) {
+        nodes <- NA
+        scales <- NA
+        types <- NA
+      } else {
+        
+        int <- lastrates[8:length(lastrates)]
+   
+        nodes <- unlist(c(int[grep("NodeID*", names(int))]))
+        scales <- unlist(c(int[grep("Scale*", names(int))]))
+        types <- unlist(c(int[grep("NodeBranch*", names(int))]))
+        mrcas <- sapply(nodes, function(x) fullmrcas[fullmrcas$node %in% x, "mrca"])
+        alltypes[[i]] <- types
+        allmrcas[[i]] <- mrcas
+
+        # Is this for-loop filling the scalar objects? Do I need to make them 
+        # within this function?
+        for (j in 1:length(mrcas)) {
+          nm <- paste0(types[j], "[[\"", as.character(mrcas[j]), "\"]]", "[", i, "]")
+          eval(parse(text = paste0(nm, "<-", scales[j])))
+        }
+      }
+      setTxtProgressBar(pb, i)    
+    }
+
+    close(pb)
+    res <- list(alltypes = alltypes,
+                allmrcas = allmrcas,
+                rates = rates,
+                Node = Node,
+                Branch = Branch,
+                Delta = Delta,
+                Lambda = Lambda,
+                Kappa = Kappa,
+                Node_effects = Node_effects)
+  return(res)
+}
+
+##############################################################################
+#' rjpp
 #'
 #' A function that takes the output of a kappa, lambda, delta, VRates etc. RJ bayesTraits run and runs post-processing on it.
 #' @param rjlog The RJ output of the run - typically suffixed with .VarRates.txt
-#' @param tree The tree the analysis was run on
+#' @param tree The time tree the analysis was run on as an object of class "phylo", or the filename of the timetree.
 #' @param burnin The burnin (if required) for the mcmc (generally worked out from the other logfile)
 #' @param thinning Thinning parameter for the MCMC output - again, worked out from the raw MCMC output logfile.
-#' @param returnscales Return full distributions of all scalar values that hit each node?
-#' @param returnorigins Return a list of the values of each scalar that originates at each node per iteration? 
+#' @param meanbranches If true, calculates mean, median and mode branch lengths and returns mean tree.
+#' @param ratestable 
 #' @import phytools
 #' @export
-#' @name localscalarPP2
-
-localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, 
+#' @name rjpp
+rjpp <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1, 
   meanbranches = TRUE, ratestable = TRUE) {
 
   pboptions(type = "txt", style = 3, char = "=")
@@ -37,79 +199,33 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
     meanbl = FALSE
   }
 
-    rj_output <- rjout$rj_output
-    subtrees <- rjout$subtrees
-    rjtaxa <- rjout$taxa
-    niter <- nrow(rj_output)
-    print("Finding taxa.")
-    
-    taxa <- pblapply(subtrees$node, function(x) getTaxa(x, subtrees = subtrees))
-    
-    print("Calculating MRCAs.")
-    fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAhfg(x , tree = extree, rjtaxa = rjtaxa)))
-    fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
-
-
+  rj_output <- rjout$rj_output
+  subtrees <- rjout$subtrees
+  rjtaxa <- rjout$taxa
+  niter <- nrow(rj_output)
+  print("Finding taxa.")
   
+  taxa <- pblapply(subtrees$node, function(x) getTaxa(x, subtrees = subtrees))
+  
+  print("Calculating MRCAs.")
+  fullmrcas <- unlist(pblapply(taxa, function(x) getMRCAbtr(x , tree = extree, rjtaxa = rjtaxa)))
+  fullmrcas <- data.frame(node = subtrees$node, mrca = fullmrcas)
+ 
   counts <- createCountsTable(extree, meanbl)
 
-  # Make a list to store descriptions of each scalar present in each iteration.
-  alltypes <- vector(mode = "list", length = nrow(rj_output))
-  allmrcas <- vector(mode = "list", length = nrow(rj_output))
+  # Find the scalars.
+  all_scalars <- scalarSearch(rj_output, counts)
+  alltypes <- all_scalars$alltypes
+  allmrcas <- all_scalars$allmrcas
+  rates <- all_scalars$rates
+  Node <- all_scalars$Node
+  Branch <- all_scalars$Branch
+  Delta <- all_scalars$Delta
+  Lambda <- all_scalars$Lambda
+  Kappa <- all_scalars$Kappa
+  Node_effects <- all_scalars$Node_effects
 
-  rates <- matrix(rep(1, nrow(counts) * nrow(rj_output)), ncol = nrow(rj_output))
-  rownames(rates) <- counts[ , "descNode"]
-
-  # make lists for the origins of deltas etc.
-  .tmp <- rep(1, nrow(rj_output))
-  Node <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  Branch <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  Delta <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  Lambda <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  Kappa <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  Node_effects <- replicate(nrow(counts), as.numeric(paste(.tmp)), simplify = FALSE)
-  names(Node) <- counts[ , "descNode"]
-  names(Branch) <- counts[ , "descNode"]
-  names(Delta) <- counts[ , "descNode"]
-  names(Lambda) <- counts[ , "descNode"]
-  names(Kappa) <- counts[ , "descNode"]
-  names(Node_effects) <- counts[ , "descNode"]
-
-  print("Searching for scalars...")
-  pb <- txtProgressBar(min = 0, max = nrow(rj_output), style = 3)
-  for (i in 1:nrow(rj_output)) {
-    lastrates <- rj_output[i, !is.na(rj_output[i, ])]
-    
-    # If the number of columns is seven, there are no scalars applied this generation.
-    if (ncol(lastrates) == 7) {
-      nodes <- NA
-      scales <- NA
-      types <- NA
-    } else {
-      
-      int <- lastrates[8:length(lastrates)]
- 
-      nodes <- unlist(c(int[grep("NodeID*", names(int))]))
-      scales <- unlist(c(int[grep("Scale*", names(int))]))
-      types <- unlist(c(int[grep("NodeBranch*", names(int))]))
-      mrcas <- sapply(nodes, function(x) fullmrcas[fullmrcas$node %in% x, "mrca"])
-      alltypes[[i]] <- types
-      allmrcas[[i]] <- mrcas
-
-      for (j in 1:length(mrcas)) {
-        nm <- paste0(types[j], "[[\"", as.character(mrcas[j]), "\"]]", "[", i, "]")
-        eval(parse(text = paste0(nm, "<-", scales[j])))
-      }
-    }
-    setTxtProgressBar(pb, i)    
-  }
-
-  close(pb)
-
-  # If there are node scalars, I need to find all the branches that descend from each node
-  # in the Node_effects table, and multiply the existing scalar by the node one for each
-  # generation. Then multiply by branch scalars as well.
-
+  # Calculate cumulative node effects
   for (i in 1:length(Node)) {
     .tmp <- multiplyNodes(Node[[i]], names(Node)[i], extree, Node_effects)
     Node_effects[names(.tmp)] <- .tmp
@@ -118,26 +234,22 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
   Node_effects <- lapply(1:length(Node_effects), function(x) Node_effects[[x]] * Branch[[x]])
   names(Node_effects) <- counts[ , "descNode"]
   
-  origins <- list(nodes = Node, branches = Branch, delta = Delta,
-    lambda = Lambda, kappa = Kappa, rates = Node_effects)
-
-  # Make a list the same length for the taxa descendent from each node in nodes, and the mrca 
-  # on the tree for each of those nodes. 
+  origins <- list(nodes = do.call(rbind, Node), 
+                  branches = do.call(rbind, Branch), 
+                  delta = do.call(rbind, Delta),
+                  lambda = do.call(rbind, Lambda), 
+                  kappa = do.call(rbind, Kappa), 
+                  rates = do.call(rbind, Node_effects)
+                  )
 
   alltypes <- unlist(alltypes)
   allmrcas <- unlist(allmrcas)
-
-  # nOrgnScalar (i.e. origins of ANY scalar) can go now - since it doesn't matter what those scalars
-  # are.
 
   bs <- table(unlist(allmrcas)[alltypes == "Branch"])
   ns <- table(unlist(allmrcas)[alltypes == "Node"])
   ds <- table(unlist(allmrcas)[alltypes == "Delta"])
   ks <- table(unlist(allmrcas)[alltypes == "Kappa"])
   ls <- table(unlist(allmrcas)[alltypes == "Lambda"])
-
-  # count scalar origins.
-  # This needs a little work to change the order of the bs, ns etc. to match the order in the counts table.
 
   bstaxa <- counts$descNode %in% names(bs)
   nstaxa <- counts$descNode %in% names(ns)
@@ -162,31 +274,34 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
   
   # Fill in transformation detail.
 
-  counts[ , "meanDelta"] <- unlist(lapply(origins$delta, mean))
-  counts[ , "medianDelta"] <- unlist(lapply(origins$delta, median))
-  counts[ , "modeDelta"] <- unlist(lapply(origins$delta, modeStat))
-  counts[ , "rangeDelta"] <- suppressWarnings(unlist(lapply(origins$delta, max)) - unlist(lapply(origins$delta, min)))
-  counts[ , "meanKappa"] <- unlist(lapply(origins$kappa, mean))
-  counts[ , "medianKappa"] <- unlist(lapply(origins$kappa, median))
-  counts[ , "modeKappa"] <- unlist(lapply(origins$kappa, modeStat))
-  counts[ , "rangeKappa"] <- suppressWarnings(unlist(lapply(origins$kappa, max)) - unlist(lapply(origins$kappa, min)))
-  counts[ , "meanLambda"] <- unlist(lapply(origins$lambda, mean))
-  counts[ , "medianLambda"] <- unlist(lapply(origins$lambda, median))
-  counts[ , "modeLambda"] <- unlist(lapply(origins$lambda, modeStat))
-  counts[ , "rangeLambda"] <- suppressWarnings(unlist(lapply(origins$lambda, max)) - unlist(lapply(origins$lambda, min)))
-  counts[ , "meanRate"] <- sapply(origins$rates, mean)
-  counts[ , "medianRate"] <- sapply(origins$rates, median)
-  counts[ , "modeRate"] <- sapply(origins$rates, modeStat)
-  counts[ , "rangeRate"] <- suppressWarnings(sapply(origins$rates, max) - unlist(sapply(origins$rates, min)))
+  counts[ , "meanDelta"] <- rowMeans(origins$delta)
+  counts[ , "medianDelta"] <- apply(origins$delta, 1, median)
+  counts[ , "modeDelta"] <-  apply(origins$delta, 1, modeStat)
+  counts[ , "rangeDelta"] <- suppressWarnings(apply(origins$delta, 1, max) - apply(origins$delta, 1, min))
+
+  counts[ , "meanKappa"] <- rowMeans(origins$kappa)
+  counts[ , "medianKappa"] <- apply(origins$kappa, 1, median)
+  counts[ , "modeKappa"] <- apply(origins$kappa, 1, modeStat)
+  counts[ , "rangeKappa"] <- suppressWarnings(apply(origins$kappa, 1, max) - apply(origins$kappa, 1, min))
+
+  counts[ , "meanLambda"] <- rowMeans(origins$lambda)
+  counts[ , "medianLambda"] <- apply(origins$lambda, 1, median)
+  counts[ , "modeLambda"] <- apply(origins$lambda, 1, modeStat)
+  counts[ , "rangeLambda"] <- suppressWarnings(apply(origins$lambda, 1, max) - apply(origins$lambda, 1, min))
+
+  counts[ , "meanRate"] <- rowMeans(origins$rates)
+  counts[ , "medianRate"] <- apply(origins$rates, 1, median)
+  counts[ , "modeRate"] <- apply(origins$rates, 1, modeStat)
+  counts[ , "rangeRate"] <- suppressWarnings(apply(origins$rates, 1, max) - apply(origins$rates, 1, min))
 
   counts[ , "itersScaled"] <- 
-  counts[ , "itersRatescaled"] <- sapply(origins$rates, function(x) sum(x != 1))
+  counts[ , "itersRatescaled"] <- apply(origins$rates, 1, function(x) sum(x != 1))
   counts[ , "itersDelta"] <- counts[ , "nOrgnDelta"]
   counts[ , "itersKappa"] <- counts[ , "nOrgnDelta"]
   counts[ , "itersLambda"] <- counts[ , "nOrgnDelta"]
 
   counts[ , "pScaled"] <- 
-  counts[ , "pRate"] <- sapply(origins$rates, function(x) sum(x != 1)) / niter
+  counts[ , "pRate"] <- apply(origins$rates, 1, function(x) sum(x != 1)) / niter
   counts[ , "pDelta"] <- counts[ , "nOrgnDelta"] / niter
   counts[ , "pKappa"] <- counts[ , "nOrgnKappa"] / niter
   counts[ , "pLambda"] <- counts[ , "nOrgnLambda"] / niter
@@ -239,11 +354,6 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
   }
 
   if (!is.null(origins$rates)) {
-
-    if (ratestable) {
-      origins$rates <- do.call(rbind, origins$rates)
-    }
-
     scalars <- list(rates = origins$rates)
     origins$rates <- NULL
     res <- c(res, list(scalars = scalars))
@@ -253,3 +363,4 @@ localscalarPP2 <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 
   return(res)
 }
+

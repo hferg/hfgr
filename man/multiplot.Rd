@@ -25,4 +25,3 @@ multiplot(plot1, plot2, plot3, plot4, cols = 2)
 all.plots <- list(plo1, plot2, plot3, plot4)
 multiplot(plotlist = all.plots, cols = 2)
 }
-

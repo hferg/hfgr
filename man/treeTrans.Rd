@@ -35,4 +35,3 @@ transTree(tree, param = "delta", tips = list(c("dog", "cat", "moose"), c("frog",
 \keyword{rates}
 \keyword{transformation}
 \keyword{tree}
-

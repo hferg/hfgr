@@ -31,4 +31,3 @@ Trees are simulated using the function sim.bd.taxa from TreeSim. the function ca
 if you aren't careful about the specifications, for example if the tree has 100 tips, a single clade of 95
 taxa might take a long time to find.
 }
-

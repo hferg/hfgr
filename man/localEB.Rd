@@ -18,4 +18,3 @@ localEB(tree, node, a, rescale = TRUE)
 \description{
 A function to transform a tree according to the exponential change/Early Burst model of Harmon et al 2010
 }
-

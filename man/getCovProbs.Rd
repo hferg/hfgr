@@ -15,4 +15,3 @@ A function to return the probabilities of independent or dependent at each node
 after fitting the covarion discrete model.
 probgraphs will make a pdf of the overlap in probabilities at each node.
 }
-

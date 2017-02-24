@@ -12,4 +12,3 @@ readPP(logfile)
 \description{
 A function that reads the output of the variable rates post-processor (VarPP-v1). This is the output that VarPP-v1 prints to screen, so that needs to be written to a text file first.
 }
-

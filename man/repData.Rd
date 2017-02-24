@@ -16,4 +16,3 @@ repData(dat, n, prefix)
 \description{
 This function will write a vector of data points to the working directory n times, with a given prefix and the number of the replicate as the suffix. Ideally, the names of the vector are the tip labels of the tree!
 }
-

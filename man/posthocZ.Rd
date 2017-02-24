@@ -16,4 +16,3 @@ posthocZ(tree, rjtrees, nsim = 100)
 \description{
 Simulates a trait over the posterior sample of trees, and then calculates z scores.
 }
-

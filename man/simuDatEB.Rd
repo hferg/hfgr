@@ -28,4 +28,3 @@ not need to stretch the phylogeny. This is good for exponential rate decay, but 
 at the moment - what it CAN do is do a good approximation of the delta relationship, but t isn't functioning
 as half life at the moment.
 }
-

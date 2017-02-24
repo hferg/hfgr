@@ -33,7 +33,7 @@ localDelta <- function(tree, node, delta, rescale = TRUE) {
   # subtree$edge.length <- bls[subtree$edge[ , 2]]
 
   n <- Ntip(subtree)
-  hts <- data.frame(nodeHeights(subtree))
+  hts <- data.frame(phytools::nodeHeights(subtree))
   colnames(hts) <- c("start", "end")
   T <- max(hts[,1])
 

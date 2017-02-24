@@ -47,9 +47,11 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE)
   quart75 <- vector(mode = "numeric", length = nrow(bls))
   branchesmean <- vector(mode = "numeric", length(nrow(bls)))
   branchesmedian <- vector(mode = "numeric", length(nrow(bls)))
+  branchesmode <- vector(mode = "numeric", length(nrow(bls)))
   for (i in 1:nrow(bls)) {
     branchesmean[i] <- mean(bls[i, ])
     branchesmedian[i] <- median(bls[i, ])
+    branchesmode[i] <- modeStat(bls[i, ])
     quarts <- sort(bls[i, ])
     quart25[i] <- quarts[round(length(quarts) * 0.25)]
     quart75[i] <- quarts[round(length(quarts) * 0.75)]
@@ -63,6 +65,7 @@ meanBranches <- function(reftree, trees, burnin = 0, thinning = 1, pbar = FALSE)
               meantree = meantree,
               meanbranches = branchesmean, 
               medianbranches = branchesmedian, 
+              modebranches = branchesmode,
               quart25 = quart25, 
               quart75 = quart75, 
               rangescalar = rangebl)

@@ -16,4 +16,3 @@ readSimInfo(filename, tree)
 readSimInfo
 A function that will read the simulation details from Andrews conDatSim function.
 }
-

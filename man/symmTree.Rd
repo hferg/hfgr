@@ -14,4 +14,3 @@ symmTree(n, bls = "equal")
 \description{
 Make a totally symmetrical tree of n tips with grafen branch lengths.
 }
-

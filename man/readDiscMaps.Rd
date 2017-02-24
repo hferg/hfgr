@@ -9,4 +9,3 @@ readDiscMaps(logfile, tree, burnin = 0, thinning = 1, returnpies = FALSE)
 \description{
 A function to read in and interpret the discrete/independent maps that result from model 11.
 }
-

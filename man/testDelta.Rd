@@ -17,4 +17,3 @@ testDelta(tree, datafile, node = "root")
 A function to test the output of Andrew's BM model to see if delta
 has or has not been simulated using geiger to test the likelihood.
 }
-

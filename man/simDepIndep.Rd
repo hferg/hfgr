@@ -28,4 +28,3 @@ dependent or independent evolution (whichever the rest of the tree isn't) within
 The tree and data are simulated, and the Q matrices for the two traits are fixed for both 
 and independent evolution (at the moment).
 }
-

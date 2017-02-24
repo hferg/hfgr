@@ -20,4 +20,3 @@ simuDatLambda(tree, node, sig, w, dat = NULL)
 \description{
 Simulate data over a phylogeny, or part of a phylogeny, according to the model of Munkemuller et al 2012 by simulating data with a Brownian Motion process, and then adding noise to reflect loss of signal.
 }
-

@@ -26,4 +26,3 @@ plotPhylo(tree, tips = FALSE, nodes = NULL, scale = TRUE, cex = 1,
 A silly little function that makes plotting a tree without tip labels and with
 an axis easier and quicker.
 }
-

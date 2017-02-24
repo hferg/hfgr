@@ -23,4 +23,3 @@ localscalarPP2(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 \description{
 A function that takes the output of a kappa, lambda, delta, VRates etc. RJ bayesTraits run and runs post-processing on it.
 }
-

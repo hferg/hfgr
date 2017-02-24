@@ -29,4 +29,3 @@ Simulate data over a phylogeny, or sub section of a phylogeny, in order to refle
 Based on adding a constant to the tip data branch by branch and weighting by branch length and does
 not need to stretch the phylogeny.
 }
-

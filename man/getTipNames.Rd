@@ -14,4 +14,3 @@ getTipNames(tree, node)
 \description{
 A function to get the names of the descendant tips from a given node of a tree.
 }
-

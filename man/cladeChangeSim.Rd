@@ -24,4 +24,3 @@ cladeChangeSim(tree, reftree = NULL, node = "root", mode = "BM",
 cladeChangeSim
 Simulates the expected change along all branches of a defined clade.
 }
-

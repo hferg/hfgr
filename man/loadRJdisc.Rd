@@ -21,4 +21,3 @@ Returns the full mcmc object from a BayesTraits discrete model log file. This
 is used inside plot functions and so on, but might be useful for
 other MCMC manipulations and so on.
 }
-

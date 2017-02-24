@@ -9,4 +9,3 @@ phyloHeights(tree)
 \description{
 Essentially the same function as heights.phylo from geiger
 }
-

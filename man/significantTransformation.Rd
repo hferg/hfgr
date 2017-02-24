@@ -5,7 +5,7 @@
 \title{significantTransformation}
 \usage{
 significantTransformation(PP, scalar, measure = "median", threshold = 0,
-  excludeones = FALSE)
+  excludeones = FALSE, tree = NULL, includerates = NULL)
 }
 \arguments{
 \item{PP}{The psotprocessor (localscalrPP) output.}
@@ -15,8 +15,9 @@ significantTransformation(PP, scalar, measure = "median", threshold = 0,
 \item{measure}{Median (default), mean or mode scalar.}
 
 \item{threshold}{Threshold of probability in posterior to display deltas for, defaults to zero (i.e. shows all deltas shaded proportionally to the posterior probability)}
+
+\item{includerates}{When a non-linear transformation is fitted along with variable rates it might be desireable to look at the tree scaled by rate as well as transformation. This is the threshold for significance for rates, and is disabled by default.}
 }
 \description{
 Transforms a tree according to only the scalars present above a certain threshold.
 }
-

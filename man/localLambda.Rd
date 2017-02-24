@@ -16,4 +16,3 @@ localLambda(tree, node, lambda)
 \description{
 A function that transforms a tree according to lambda, or a portion of a tree according to lambda.
 }
-
