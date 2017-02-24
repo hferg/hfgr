@@ -1,4 +1,65 @@
 ##############################################################################
+#' loadRJ
+#'
+#' Returns the full mcmc object from a BayesTraits log file. This
+#' is used inside plot functions and so on, but might be useful for
+#' other MCMC manipulations and so on.
+#' @param logfile The name of the logfile of the BayesTraits analysis.
+#' @return A list containing the taxa translation table, all possible subtrees a scalar can occur on, and a data frame of the rj model configuration.
+#' @export
+loadRJ <- function(logfile, burnin = 0, thinning = 1) {
+
+  raw <- readLines(logfile)
+  rawhead <- strsplit(raw[1:(grep("\\bIt*\\b", raw) -1)], "\t")
+  rawtail <- strsplit(raw[grep("\\bIt*\\b", raw):length(raw)], "\t")
+  nms1 <- rawtail[[1]][1:7]
+  nms2 <- rawtail[[1]][8:length(rawtail[[1]])]
+  nms2 <- gsub(" ", "", nms2)
+  nms2 <- gsub("/", "", nms2)  
+
+  for (i in 1:length(rawtail)) {
+    if (length(rawtail[[i]]) == 7) {
+      names(rawtail[[i]]) <- nms1
+    } else {
+      len <- length(rawtail[[i]][8:length(rawtail[[i]])])
+      end <- vector(mode = "character", length = len)
+      
+      st <- 1
+      ed <- 4
+      for (j in 1:(len/4)) { 
+        end[c(st:ed)] <- paste(nms2, j, sep = "_")
+        st <- st + 4
+        ed <- ed + 4
+      }
+      nms <- c(nms1, end)
+      names(rawtail[[i]]) <- nms
+    }
+  }
+
+  tipnum <- rawhead[[1]]
+  taxatrans <- do.call(rbind, rawhead[c(1:tipnum+1)])  
+  subtreestart <- nrow(taxatrans) + 3
+  subtrees <- rawhead[subtreestart:length(rawhead)]
+  
+  for (i in 1:length(subtrees)) {
+    names(subtrees[[i]]) <- c(1:length(subtrees[[i]]))
+  }
+  
+  output <- do.call(smartBind, rawtail)
+  output <- output[seq.int(burnin, nrow(output), thinning), ]
+  output <- data.frame(output[2:nrow(output), ], stringsAsFactors = FALSE)
+  subtrees <- do.call(smartBind, subtrees)
+  subtrees <- data.frame(subtrees, stringsAsFactors = FALSE)
+  colnames(subtrees)[c(1:2)] <- c("node", "bl")
+
+  res <- list(taxatrans, subtrees, output)
+  names(res) <- c("taxa", "subtrees", "rj_output")
+  return(res)
+}
+
+
+
+##############################################################################
 #' createCounts
 #' Creates the counts table for the rjpp.
 #' @param extree The time tree
@@ -160,6 +221,7 @@ scalarSearch <- function(rj_output, counts) {
   return(res)
 }
 
+
 ##############################################################################
 #' rjpp
 #'
@@ -215,35 +277,30 @@ rjpp <- function(rjlog, rjtrees, tree, burnin = 0, thinning = 1,
 
   # Find the scalars.
   all_scalars <- scalarSearch(rj_output, counts)
-  alltypes <- all_scalars$alltypes
-  allmrcas <- all_scalars$allmrcas
-  rates <- all_scalars$rates
-  Node <- all_scalars$Node
-  Branch <- all_scalars$Branch
-  Delta <- all_scalars$Delta
-  Lambda <- all_scalars$Lambda
-  Kappa <- all_scalars$Kappa
-  Node_effects <- all_scalars$Node_effects
 
   # Calculate cumulative node effects
-  for (i in 1:length(Node)) {
-    .tmp <- multiplyNodes(Node[[i]], names(Node)[i], extree, Node_effects)
-    Node_effects[names(.tmp)] <- .tmp
+  for (i in 1:length(all_scalars$Node)) {
+    .tmp <- multiplyNodes(all_scalars$Node[[i]], 
+      names(all_scalars$Node)[i], 
+      extree, 
+      all_scalars$Node_effects)
+    all_scalars$Node_effects[names(.tmp)] <- .tmp
   }
 
-  Node_effects <- lapply(1:length(Node_effects), function(x) Node_effects[[x]] * Branch[[x]])
-  names(Node_effects) <- counts[ , "descNode"]
+  all_scalars$Node_effects <- lapply(1:length(all_scalars$Node_effects), 
+    function(x) all_scalars$Node_effects[[x]] * all_scalars$Branch[[x]])
+  names(all_scalars$Node_effects) <- counts[ , "descNode"]
   
-  origins <- list(nodes = do.call(rbind, Node), 
-                  branches = do.call(rbind, Branch), 
-                  delta = do.call(rbind, Delta),
-                  lambda = do.call(rbind, Lambda), 
-                  kappa = do.call(rbind, Kappa), 
-                  rates = do.call(rbind, Node_effects)
+  origins <- list(nodes = do.call(rbind, all_scalars$Node), 
+                  branches = do.call(rbind, all_scalars$Branch), 
+                  delta = do.call(rbind, all_scalars$Delta),
+                  lambda = do.call(rbind, all_scalars$Lambda), 
+                  kappa = do.call(rbind, all_scalars$Kappa), 
+                  rates = do.call(rbind, all_scalars$Node_effects)
                   )
 
-  alltypes <- unlist(alltypes)
-  allmrcas <- unlist(allmrcas)
+  alltypes <- unlist(all_scalars$alltypes)
+  allmrcas <- unlist(all_scalars$allmrcas)
 
   bs <- table(unlist(allmrcas)[alltypes == "Branch"])
   ns <- table(unlist(allmrcas)[alltypes == "Node"])

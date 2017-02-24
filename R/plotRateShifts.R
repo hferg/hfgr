@@ -1,9 +1,19 @@
-# Here is a function for you. pp is the output of the post-processor, tree is the timetree, and threshold is the decimal of the threshold you want.
-treez4chris <- function(pp, threshold, measure = "mean") {
+#' plotRateShifts
+#' A simple function to scale the tree scaled by the mean, median or mode scalars of branches
+#' that are scaled over a certain threshold.
+#' @param pp An output object from rjpp
+#' @param threshold The threshold over which branches are scaled (in decimal form)
+#' @param measure "mean", "median" or "mode" - how to summarise the scalars that are used.
+#' @name plotRateShifts
+#' @export
+
+plotRateShifts <- function(pp, threshold, measure = "mean") {
   if (measure == "mean") {
     ms <- "meanBL"
   } else if (measure == "median") {
     ms <- "medianBL"
+  } else if (measure == "mode") {
+    ms <- "modeBL"
   }
 
   tree <- pp$meantree
